@@ -17,6 +17,7 @@ use Template::EJS::IO;
 
 sub new {
 	my ($class, $config) = @_;
+	$config = {} unless ref $config;
 	return bless {config => $config}, $class;
 }
 
