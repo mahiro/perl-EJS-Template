@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Template/EJS.pm
+lib/Template/EJS/IO.pm
+lib/Template/EJS/Parser.pm
+lib/Template/EJS/Executor.pm
+t/00-load.t
+t/01-process.t

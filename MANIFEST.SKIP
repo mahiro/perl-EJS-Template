@@ -1,0 +1,8 @@
+.git
+.gitignore
+MANIFEST.SKIP
+Makefile.old
+t/boilerplate.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
