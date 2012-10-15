@@ -4,7 +4,7 @@ use warnings;
 
 package Template::EJS::IO;
 
-use IO::String;
+use IO::Scalar;
 use Scalar::Util qw(openhandle);
 
 =head2 input
@@ -21,7 +21,7 @@ sub input {
 		if (openhandle($input)) {
 			$in = $input;
 		} elsif (ref $input) {
-			$in = IO::String->new($input);
+			$in = IO::Scalar->new($input);
 		} else {
 			open $in, $input or die "$!: $input";
 			$should_close = 1;
@@ -48,7 +48,7 @@ sub output {
 			if (openhandle $output) {
 				$out = $output;
 			} else {
-				$out = IO::String->new($output);
+				$out = IO::Scalar->new($output);
 			}
 		} else {
 			open($out, '>', $output) or die "$!: $output";
