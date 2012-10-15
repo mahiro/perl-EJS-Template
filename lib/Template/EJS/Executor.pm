@@ -26,16 +26,15 @@ sub execute {
 	
 	my $engine = $self->_get_engine();
 	my ($out, $out_close) = Template::EJS::IO->output($output);
+	my $ret;
 	
 	eval {
 		my $context = $self->_create_context($engine, $variables, $out);
 		my ($in, $in_close) = Template::EJS::IO->input($input);
 		
-		eval {
-			my $ret = do {
-				local $/;
-				$context->eval(<$in>) or die $@;
-			};
+		$ret = eval {
+			local $/;
+			$context->eval(<$in>) or die $@;
 		};
 		
 		my $e = $@;
