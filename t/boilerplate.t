@@ -49,7 +49,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/Template/EJS.pm');
+  module_boilerplate_ok('lib/EJS/Template.pm');
 
 
 }

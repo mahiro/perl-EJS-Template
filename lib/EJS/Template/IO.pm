@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-package Template::EJS::IO;
+package EJS::Template::IO;
 
 use IO::Scalar;
 use Scalar::Util qw(openhandle);

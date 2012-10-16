@@ -2,14 +2,14 @@ use 5.006;
 use strict;
 use warnings;
 
-package Template::EJS;
+package EJS::Template;
 
-use Template::EJS::Executor;
-use Template::EJS::Parser;
+use EJS::Template::Executor;
+use EJS::Template::Parser;
 
 =head1 NAME
 
-Template::EJS - EJS (Embedded JavaScript) template engine
+EJS::Template - EJS (Embedded JavaScript) template engine
 
 =head1 VERSION
 
@@ -22,8 +22,8 @@ our $VERSION = '0.01';
 =head1 SYNOPSIS
 
     # Perl
-    use Template::EJS;
-    Template::EJS->process('source.ejs', {name => 'World'});
+    use EJS::Template;
+    EJS::Template->process('source.ejs', {name => 'World'});
     
     # source.ejs
     <% for (var i = 0; i < 3; i++) { %>
@@ -39,11 +39,11 @@ our $VERSION = '0.01';
 
 =head2 new
 
-Creates a C<Template::EJS> object with configuration name/value pairs.
+Creates a C<EJS::Template> object with configuration name/value pairs.
 
 Usage:
 
-   my $ejs = Template::EJS->new( [NAME => VALUE, ...] );
+   my $ejs = EJS::Template->new( [NAME => VALUE, ...] );
 
 =cut
 
@@ -60,23 +60,23 @@ sub new {
 Usage:
 
     # Simple
-    Template::EJS->process(INPUT [, VARIABLES [, OUTPUT ] ] );
+    EJS::Template->process(INPUT [, VARIABLES [, OUTPUT ] ] );
     
     # Custom
-    my $ejs = Template::EJS->new(...);
+    my $ejs = EJS::Template->new(...);
     $ejs->process(INPUT [, VARIABLES [, OUTPUT ] ] );
 
 Examples:
 
     # Reads the file 'source.ejs' and prints the result to STDOUT
-    Template::EJS->process('source.ejs', {name => 'value'});
+    EJS::Template->process('source.ejs', {name => 'value'});
 
     # Reads STDIN as the EJS source and writes the result to the file 'output.txt'
-    Template::EJS->process(\*STDIN, {name => 'value'}, 'output.txt');
+    EJS::Template->process(\*STDIN, {name => 'value'}, 'output.txt');
 
     # Parses the EJS source text and stores the result to the variable $out
     my $out;
-    Template::EJS->process(\'Hello <%=name%>', {name => 'World'}, \$out);
+    EJS::Template->process(\'Hello <%=name%>', {name => 'World'}, \$out);
 
 =cut
 
@@ -93,7 +93,7 @@ sub process {
 
 sub parse {
 	my ($self, $input, $parsed_output) = @_;
-	my $parser = Template::EJS::Parser->new($self);
+	my $parser = EJS::Template::Parser->new($self);
 	$parser->parse($input, $parsed_output);
 }
 
@@ -103,19 +103,19 @@ sub parse {
 
 sub execute {
 	my ($self, $parsed_input, $variables, $output) = @_;
-	my $executor = Template::EJS::Executor->new($self);
+	my $executor = EJS::Template::Executor->new($self);
 	$executor->execute($parsed_input, $variables, $output);
 }
 
 =head1 JavaScript Engines
 
-C<Template::EJS> automatically determines the available JavaScript engine from the below:
+C<EJS::Template> automatically determines the available JavaScript engine from the below:
 
 =over 4
 
 =item * V8 (same engine as Google Chrome):
 
-L<JavaScript::V8> (default for C<Template::EJS>)
+L<JavaScript::V8> (default for C<EJS::Template>)
 
 =item * SpiderMonkey (same engine as Mozilla Firefox):
 
@@ -156,14 +156,14 @@ Mahiro Ando, C<< <mahiro at cpan.org> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-template-ejs at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-EJS>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=EJS-Template>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Template::EJS
+    perldoc EJS::Template
 
 You can also look for information at:
 
@@ -171,19 +171,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-EJS>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=EJS-Template>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Template-EJS>
+L<http://annocpan.org/dist/EJS-Template>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Template-EJS>
+L<http://cpanratings.perl.org/d/EJS-Template>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Template-EJS/>
+L<http://search.cpan.org/dist/EJS-Template/>
 
 =back
 
@@ -202,4 +202,4 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-1; # End of Template::EJS
+1; # End of EJS::Template

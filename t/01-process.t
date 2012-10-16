@@ -2,12 +2,12 @@
 
 use Test::More tests => 6;
 
-use Template::EJS;
+use EJS::Template;
 
 sub process {
 	my ($source, $variables) = @_;
 	my $output;
-	Template::EJS->process(\$source, $variables, \$output) or die $@;
+	EJS::Template->process(\$source, $variables, \$output) or die $@;
 	return $output;
 }
 

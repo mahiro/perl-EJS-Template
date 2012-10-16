@@ -2,14 +2,14 @@ use 5.006;
 use strict;
 use warnings;
 
-package Template::EJS::Parser;
+package EJS::Template::Parser;
 
 use constant TEXT    => 0;
 use constant SCRIPT  => 1;
 use constant QUOTE   => 2;
 use constant COMMENT => 4;
 
-use Template::EJS::IO;
+use EJS::Template::IO;
 
 =head2 new
 
@@ -27,7 +27,7 @@ sub new {
 
 sub parse {
 	my ($self, $input, $output) = @_;
-	my ($in, $in_close) = Template::EJS::IO->input($input);
+	my ($in, $in_close) = EJS::Template::IO->input($input);
 	
 	my $state = TEXT;
 	my $printing = 0;
@@ -105,7 +105,7 @@ sub parse {
 	push @result, qq{");\n};
 	close $in if $in_close;
 	
-	my ($out, $out_close) = Template::EJS::IO->output($output);
+	my ($out, $out_close) = EJS::Template::IO->output($output);
 	print $out $_ foreach @result;
 	close $out if $out_close;
 	

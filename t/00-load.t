@@ -3,7 +3,7 @@
 use Test::More tests => 1;
 
 BEGIN {
-    use_ok( 'Template::EJS' ) || print "Bail out!\n";
+    use_ok( 'EJS::Template' ) || print "Bail out!\n";
 }
 
-diag( "Testing Template::EJS $Template::EJS::VERSION, Perl $], $^X" );
+diag( "Testing EJS::Template $EJS::Template::VERSION, Perl $], $^X" );

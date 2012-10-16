@@ -4,10 +4,10 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'Template::EJS',
+    NAME                => 'EJS::Template',
     AUTHOR              => q{Mahiro Ando <mahiro@cpan.org>},
-    VERSION_FROM        => 'lib/Template/EJS.pm',
-    ABSTRACT_FROM       => 'lib/Template/EJS.pm',
+    VERSION_FROM        => 'lib/EJS/Template.pm',
+    ABSTRACT_FROM       => 'lib/EJS/Template.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')
       : ()),
@@ -17,5 +17,5 @@ WriteMakefile(
         'Test::More' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Template-EJS-*' },
+    clean               => { FILES => 'EJS-Template-*' },
 );

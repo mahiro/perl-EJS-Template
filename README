@@ -1,4 +1,4 @@
-Template-EJS
+EJS-Template
 
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for
@@ -26,21 +26,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc Template::EJS
+    perldoc EJS::Template
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-EJS
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=EJS-Template
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Template-EJS
+        http://annocpan.org/dist/EJS-Template
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Template-EJS
+        http://cpanratings.perl.org/d/EJS-Template
 
     Search CPAN
-        http://search.cpan.org/dist/Template-EJS/
+        http://search.cpan.org/dist/EJS-Template/
 
 
 LICENSE AND COPYRIGHT

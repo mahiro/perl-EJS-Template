@@ -2,10 +2,10 @@ use 5.006;
 use strict;
 use warnings;
 
-package Template::EJS::Executor;
+package EJS::Template::Executor;
 
+use EJS::Template::IO;
 use Scalar::Util qw(reftype);
-use Template::EJS::IO;
 
 =head2 new
 
@@ -25,12 +25,12 @@ sub execute {
 	my ($self, $input, $variables, $output) = @_;
 	
 	my $engine = $self->_get_engine();
-	my ($out, $out_close) = Template::EJS::IO->output($output);
+	my ($out, $out_close) = EJS::Template::IO->output($output);
 	my $ret;
 	
 	eval {
 		my $context = $self->_create_context($engine, $variables, $out);
-		my ($in, $in_close) = Template::EJS::IO->input($input);
+		my ($in, $in_close) = EJS::Template::IO->input($input);
 		
 		$ret = eval {
 			local $/;
