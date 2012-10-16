@@ -22,6 +22,7 @@ sub input {
 			$in = $input;
 		} elsif (ref $input) {
 			$in = IO::String->new($input);
+			$should_close = 1;
 		} else {
 			open $in, $input or die "$!: $input";
 			$should_close = 1;
@@ -44,12 +45,12 @@ sub output {
 	my $should_close = 0;
 	
 	if (defined $output) {
-		if (ref $output) {
-			if (openhandle $output) {
-				$out = $output;
-			} else {
-				$out = IO::String->new($output);
-			}
+		if (openhandle $output) {
+			$out = $output;
+		} elsif (ref $output) {
+			$$output = '';
+			$out = IO::String->new($output);
+			$should_close = 1;
 		} else {
 			open($out, '>', $output) or die "$!: $output";
 			$should_close = 1;
