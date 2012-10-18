@@ -45,7 +45,7 @@ sub create {
 	} elsif ($default_engine) {
 		return $default_engine->new();
 	} else {
-		for my $candidate (qw(JavaScript::V8 JE)) {
+		for my $candidate (qw(JavaScript::V8 JavaScript::SpiderMonkey JE)) {
 			my $engine_class = $class.'::'.$candidate;
 			eval "require $engine_class";
 			next if $@;
