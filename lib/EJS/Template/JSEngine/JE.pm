@@ -24,26 +24,57 @@ sub new {
 
 sub bind {
 	my ($self, $variables) = @_;
+	my $context = $self->context;
 	
-	my $assign;
+	my $assign_hash;
+	my $assign_array;
 	
-	$assign = sub {
+	$assign_hash = sub {
 		my ($target, $source) = @_;
 		
 		for my $name (keys %$source) {
 			my $ref = reftype $source->{$name};
 			
-			if ($ref && $ref eq 'HASH') {
-				$assign->($target->{$name} = {}, $source->{$name});
+			if ($ref) {
+				if ($ref eq 'HASH') {
+					$assign_hash->($target->{$name} = {}, $source->{$name});
+				} elsif ($ref eq 'ARRAY') {
+					$assign_array->($target->{$name} = [], $source->{$name});
+				} elsif ($ref eq 'CODE') {
+					$target->{$name} = $source->{$name};
+				} else {
+					# ignore?
+				}
 			} else {
 				$target->{$name} = $source->{$name};
 			}
 		}
 	};
 	
-	my $context = $self->context;
-	$assign->($context, $variables);
+	$assign_array = sub {
+		my ($target, $source) = @_;
+		my $len = scalar(@$source);
+		
+		for (my $i = 0; $i < $len; $i++) {
+			my $ref = reftype $source->[$i];
+			
+			if ($ref) {
+				if ($ref eq 'HASH') {
+					$assign_hash->($target->[$i] = {}, $source->[$i]);
+				} elsif ($ref eq 'ARRAY') {
+					$assign_array->($target->[$i] = [], $source->[$i]);
+				} elsif ($ref eq 'CODE') {
+					$target->[$i] = $source->[$i];
+				} else {
+					# ignore?
+				}
+			} else {
+				$target->[$i] = $source->[$i];
+			}
+		}
+	};
 	
+	$assign_hash->($context, $variables);
 	return $context;
 }
 
