@@ -1,11 +1,11 @@
 #!perl -T
 
-use Test::More tests => 3;
-
 use EJS::Template;
 use EJS::Template::JSEngine;
 
-for my $engine (qw(JavaScript::V8 JavaScript::SpiderMonkey JE)) {
+use Test::More tests => scalar(@EJS::Template::JSEngine::SupportedEngines);
+
+for my $engine (@EJS::Template::JSEngine::SupportedEngines) {
 	eval {EJS::Template::JSEngine->create($engine)};
 	
 	SKIP: {

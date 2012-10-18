@@ -10,6 +10,12 @@ EJS::Template::JSEngine - JavaScript engine adapter for EJS::Template
 
 package EJS::Template::JSEngine;
 
+our @SupportedEngines = qw(
+	JavaScript::V8
+	JavaScript::SpiderMonkey
+	JE
+);
+
 my $default_engine;
 
 =head1 Methods
@@ -45,7 +51,7 @@ sub create {
 	} elsif ($default_engine) {
 		return $default_engine->new();
 	} else {
-		for my $candidate (qw(JavaScript::V8 JavaScript::SpiderMonkey JE)) {
+		for my $candidate (@SupportedEngines) {
 			my $engine_class = $class.'::'.$candidate;
 			eval "require $engine_class";
 			next if $@;
