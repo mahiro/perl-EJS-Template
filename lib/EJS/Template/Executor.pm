@@ -32,9 +32,14 @@ sub execute {
 		my $context = $self->_create_context($engine, $variables, $out);
 		my ($in, $in_close) = EJS::Template::IO->input($input);
 		
-		$ret = eval {
+		eval {
 			local $/;
-			$context->eval(<$in>) or die $@;
+			
+			if (defined(my $js = <$in>)) {
+				$ret = $context->eval($js) or die $@;
+			} else {
+				$ret = 1;
+			}
 		};
 		
 		my $e = $@;
