@@ -5,7 +5,7 @@ use warnings;
 package EJS::Template::Executor;
 
 use EJS::Template::IO;
-use Scalar::Util qw(reftype);
+use EJS::Template::JSEngine;
 
 =head2 new
 
@@ -23,20 +23,22 @@ sub new {
 
 sub execute {
 	my ($self, $input, $variables, $output) = @_;
+	my $engine = EJS::Template::JSEngine->create($self->{config}{engine});
 	
-	my $engine = $self->_get_engine();
 	my ($out, $out_close) = EJS::Template::IO->output($output);
 	my $ret;
 	
 	eval {
-		my $context = $self->_create_context($engine, $variables, $out);
+		$engine->bind({print => sub { print $out @_ }});
+		$engine->bind($variables);
+		
 		my ($in, $in_close) = EJS::Template::IO->input($input);
 		
 		eval {
 			local $/;
 			
 			if (defined(my $js = <$in>)) {
-				$ret = $context->eval($js) or die $@;
+				$ret = $engine->eval($js) or die $@;
 			} else {
 				$ret = 1;
 			}
@@ -52,72 +54,6 @@ sub execute {
 	die $e if $e;
 	
 	return $ret;
-}
-
-my $default_engine;
-
-sub _get_engine {
-	my ($self) = @_;
-	
-	if (my $engine = $self->{config}{engine}) {
-		eval "use $engine";
-		die $@ if $@;
-		return $engine;
-	} elsif (defined $default_engine) {
-		return $default_engine if $default_engine ne '';
-	} else {
-		my $engines = [qw(JavaScript::V8 JE)];
-		
-		for my $engine (@$engines) {
-			eval "use $engine";
-			next if $@;
-			return $default_engine = $engine;
-		}
-		
-		$default_engine = '';
-	}
-	
-	die "No JavaScript engine modules are found. Consider to install JavaScript::V8";
-}
-
-sub _create_context {
-	my ($self, $engine, $variables, $out) = @_;
-	$variables ||= {};
-	
-	my $context;
-	
-	if ($engine eq 'JavaScript::V8') {
-		$context = JavaScript::V8::Context->new();
-		$context->bind(print => sub { print $out @_ });
-		
-		for my $name (keys %$variables) {
-			$context->bind($name, $variables->{$name});
-		}
-	} elsif ($engine eq 'JE') {
-		$context = JE->new;
-		$context->new_function(print => sub { print $out @_ });
-		
-		my $assign;
-		
-		$assign = sub {
-			my ($target, $source) = @_;
-			
-			for my $name (keys %$source) {
-				my $ref = reftype $source->{$name};
-				
-				if ($ref && $ref eq 'HASH') {
-					$assign->($target->{$name} = {}, $source->{$name});
-				} else {
-					$target->{$name} = $source->{$name};
-				}
-			}
-		};
-		
-		$assign->($context, $variables);
-	}
-	
-	$context or die "JavaScript engine '$engine' is not supported";
-	return $context;
 }
 
 1;
