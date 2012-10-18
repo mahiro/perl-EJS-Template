@@ -90,4 +90,10 @@ sub bind {
 	return $context;
 }
 
+sub DESTROY {
+	my ($self) = @_;
+	$self->{context}->destroy();
+	delete $self->{context};
+}
+
 1;
