@@ -38,7 +38,9 @@ sub execute {
 			local $/;
 			
 			if (defined(my $js = <$in>)) {
-				$ret = $engine->eval($js) or die $@;
+				local $@;
+				$ret = $engine->eval($js);
+				die $@ if $@;
 			} else {
 				$ret = 1;
 			}
