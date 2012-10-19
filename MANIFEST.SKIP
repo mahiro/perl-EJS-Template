@@ -2,6 +2,7 @@
 \.gitignore$
 (^|/)\..*\.swp$
 .*,v$
+\.tar\.gz$
 ^MANIFEST\.SKIP$
 ^Makefile\.old$
 ^t/boilerplate\.t$
