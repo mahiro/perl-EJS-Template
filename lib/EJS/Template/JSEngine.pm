@@ -12,6 +12,7 @@ package EJS::Template::JSEngine;
 
 our @SupportedEngines = qw(
 	JavaScript::V8
+	JavaScript
 	JavaScript::SpiderMonkey
 	JE
 );

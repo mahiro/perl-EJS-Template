@@ -7,6 +7,7 @@ lib/EJS/Template/Executor.pm
 lib/EJS/Template/IO.pm
 lib/EJS/Template/JSEngine.pm
 lib/EJS/Template/JSEngine/JE.pm
+lib/EJS/Template/JSEngine/JavaScript.pm
 lib/EJS/Template/JSEngine/JavaScript/SpiderMonkey.pm
 lib/EJS/Template/JSEngine/JavaScript/V8.pm
 lib/EJS/Template/Parser.pm
