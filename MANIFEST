@@ -12,6 +12,7 @@ lib/EJS/Template/JSEngine/JavaScript.pm
 lib/EJS/Template/JSEngine/JavaScript/SpiderMonkey.pm
 lib/EJS/Template/JSEngine/JavaScript/V8.pm
 lib/EJS/Template/Parser.pm
+lib/EJS/Template/Parser/Context.pm
 lib/EJS/Template/Runtime.pm
 t/00-load.t
 t/01-process.t
