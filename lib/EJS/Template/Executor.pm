@@ -3,19 +3,11 @@ use strict;
 use warnings;
 
 package EJS::Template::Executor;
+use base 'EJS::Template::Base';
 
 use EJS::Template::IO;
 use EJS::Template::JSEngine;
-
-=head2 new
-
-=cut
-
-sub new {
-	my ($class, $config) = @_;
-	$config = {} unless ref $config;
-	return bless {config => $config}, $class;
-}
+use EJS::Template::Runtime;
 
 =head2 execute
 
@@ -29,7 +21,9 @@ sub execute {
 	my $ret;
 	
 	eval {
+		my $runtime = EJS::Template::Runtime->new($self);
 		$engine->bind({print => sub { print $out @_ }});
+		$engine->bind({EJS => $runtime->make_map()});
 		$engine->bind($variables);
 		
 		my ($in, $in_close) = EJS::Template::IO->input($input);

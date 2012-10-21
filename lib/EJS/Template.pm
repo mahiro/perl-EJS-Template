@@ -65,6 +65,7 @@ sub new {
 	
 	return bless {
 		engine => $config{engine} || 'JavaScript::V8',
+		escape => $config{escape} || '',
 	}, $class;
 }
 

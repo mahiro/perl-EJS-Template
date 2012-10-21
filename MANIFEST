@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 README
 lib/EJS/Template.pm
+lib/EJS/Template/Base.pm
 lib/EJS/Template/Executor.pm
 lib/EJS/Template/IO.pm
 lib/EJS/Template/JSEngine.pm
@@ -11,8 +12,10 @@ lib/EJS/Template/JSEngine/JavaScript.pm
 lib/EJS/Template/JSEngine/JavaScript/SpiderMonkey.pm
 lib/EJS/Template/JSEngine/JavaScript/V8.pm
 lib/EJS/Template/Parser.pm
+lib/EJS/Template/Runtime.pm
 t/00-load.t
 t/01-process.t
 t/02-engines.t
 t/03-parse.t
 t/04-trimming.t
+t/05-escape.t

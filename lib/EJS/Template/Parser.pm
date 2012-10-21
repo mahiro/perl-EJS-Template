@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 package EJS::Template::Parser;
+use base 'EJS::Template::Base';
 
 use constant TEXT    => 0;
 use constant SCRIPT  => 1;
@@ -10,16 +11,7 @@ use constant QUOTE   => 2;
 use constant COMMENT => 4;
 
 use EJS::Template::IO;
-
-=head2 new
-
-=cut
-
-sub new {
-	my ($class, $config) = @_;
-	$config = {} unless ref $config;
-	return bless {config => $config}, $class;
-}
+use EJS::Template::Runtime;
 
 =head2 parse
 
@@ -31,24 +23,44 @@ sub parse {
 	
 	my $state = TEXT;
 	my $interpolating = 0;
+	my $escaping = 0;
 	my $printing = 0;
 	my $left_trimmed = 0;
 	my $left_trimmed_index = undef;
+	
+	my $default_escape = do {
+		my $name = $self->config('escape') || '';
+		
+		if ($name eq '' || $name eq 'raw') {
+			'';
+		} else {
+			$EJS::Template::Runtime::ESCAPES{$name} || '';
+		}
+	};
 	
 	my @result;
 	
 	while (my $line = <$in>) {
 		my $right_trimmed = 0;
 		
-		while ($line =~ m{(.*?)((^\s*)?<%=?|%>(\s*?$)?|["']|/\*|\*/|//|\n|$)}g) {
+		while ($line =~ m{(.*?)((^\s*)?<%(?:(?:\s*:\s*\w+\s*)?=)?|%>(\s*?$)?|["']|/\*|\*/|//|\n|$)}g) {
 			my ($text, $mark, $left, $right) = ($1, $2, $3, $4);
+			my $escape;
+			
+			if ($mark =~ s/<%\s*:\s*(\w+)\s*=/<%=/) {
+				my $name = $1;
+				$escape = $EJS::Template::Runtime::ESCAPES{$name} || '';
+			} elsif ($mark eq '<%=') {
+				$escape = $default_escape;
+			}
+			
 			$mark =~ s/\s+(<%=?)/$1/;
 			$mark =~ s/(%>)\s+/$1/;
 			
 			if ($state == TEXT) {
 				$text =~ s/\\/\\\\/g;
 				
-				if ($text ne '') {
+				if ($text ne '' || $mark eq '"' || $mark eq "'") {
 					if (!$printing) {
 						push @result, qq{print("};
 						$printing = 1;
@@ -85,6 +97,12 @@ sub parse {
 					}
 					
 					push @result, qq{print(};
+					
+					if ($escape) {
+						push @result, qq{EJS.$escape(};
+						$escaping = 1;
+					}
+					
 					$interpolating = 1;
 					
 					$state = SCRIPT;
@@ -116,7 +134,13 @@ sub parse {
 					push @result, $mark;
 				} elsif ($mark eq '%>') {
 					if ($interpolating) {
-						push @result, qq{);};
+						if ($escaping) {
+							push @result, qq{));};
+						} else {
+							push @result, qq{);};
+						}
+						
+						$escaping = 0;
 						$interpolating = 0;
 						
 						if (defined $right && $right ne '') {
@@ -152,7 +176,14 @@ sub parse {
 	close $in if $in_close;
 	
 	push @result, qq{");} if $printing;
-	push @result, qq{);} if $interpolating;
+	
+	if ($interpolating) {
+		if ($escaping) {
+			push @result, qq{));};
+		} else {
+			push @result, qq{);};
+		}
+	}
 	
 	my ($out, $out_close) = EJS::Template::IO->output($output);
 	print $out $_ foreach @result;
