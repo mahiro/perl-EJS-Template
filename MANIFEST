@@ -15,3 +15,4 @@ t/00-load.t
 t/01-process.t
 t/02-engines.t
 t/03-parse.t
+t/04-trimming.t

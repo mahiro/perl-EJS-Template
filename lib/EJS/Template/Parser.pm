@@ -32,6 +32,8 @@ sub parse {
 	my $state = TEXT;
 	my $interpolating = 0;
 	my $printing = 0;
+	my $left_trimmed = 0;
+	my $left_trimmed_index = undef;
 	
 	my @result;
 	
@@ -61,7 +63,17 @@ sub parse {
 						$printing = 0;
 					}
 					
-					push @result, $left if defined $left && $left ne '';
+					if (defined $left) {
+						$left_trimmed = 1;
+						
+						if ($left ne '') {
+							push @result, $left;
+							$left_trimmed_index = $#result;
+						} else {
+							$left_trimmed_index = undef;
+						}
+					}
+					
 					$state = SCRIPT;
 				} elsif ($mark eq '<%=') {
 					if ($printing) {
@@ -112,10 +124,23 @@ sub parse {
 							$printing = 1;
 						}
 					} else {
-						push @result, $right if defined $right && $right ne '';
-						$right_trimmed = 1 if defined $right;
+						if (defined $right) {
+							if ($left_trimmed) {
+								push @result, $right if $right ne '';
+								$right_trimmed = 1;
+							} elsif ($right ne '') {
+								push @result, qq{print("$right};
+								$printing = 1;
+							}
+						} else {
+							if ($left_trimmed && defined $left_trimmed_index) {
+								my $spaces = $result[$left_trimmed_index];
+								$result[$left_trimmed_index] = qq{print("$spaces");};
+							}
+						}
 					}
 					
+					$left_trimmed = 0;
 					$state = TEXT;
 				} else {
 					push @result, $mark;
