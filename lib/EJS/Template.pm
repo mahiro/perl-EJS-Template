@@ -35,6 +35,25 @@ our $VERSION = '0.01';
     Hello, World!
     Hello, World!
 
+Anything inside the C<< <%...%> >> tag is executed as JavaScript code,
+and anything inside the C<< <%=...%> >> tag is replaced by the evaluated value.
+
+Within C<< <%...%> >>, it is also possible to call C<print()> function:
+
+    # EJS
+    <%
+      for (var i = 0; i <= 5; i++) {
+        if (i % 2 == 1) {
+          print("i = ", i, "\n");
+        }
+      }
+    %>
+    
+    # Output
+    i = 1
+    i = 3
+    i = 5
+
 =head1 DESCRIPTION
 
 EJS is a template engine with JavaScript code embedded.
@@ -178,31 +197,55 @@ sub execute {
 
 =head1 DETAILS
 
-=head2 JavaScript Engines
+=head2 Auto-escaping
 
-C<EJS::Template> automatically determines the available JavaScript engine from the below:
+C<EJS::Template> supports auto-escaping if it is enabled via the C<new()> method.
+
+    EJS::Template->new(escape => 'html')->process(...);
+
+If the C<escape> is set to 'html', all the texts inside C<< <%=...%> >> are
+HTML-escaped automatically.
+
+    # Input
+    <% var text = "x < y < z"; %>
+    <span><%= text %></span>
+    
+    # Output
+    <span>x &lt; y &lt; z</span>
+
+In case a raw HTML needs to be embedded without escaping, it can be annotated like this:
+
+    <%:raw= text %>
+
+In addition, the following escape types are available in a similar manner
+(both for the C<< escape => >> config or in each individual tag C<< <%=...%> >>):
 
 =over 4
 
-=item * V8 (same engine as Google Chrome):
+=item * html
 
-L<JavaScript::V8> (default for C<EJS::Template>)
+    <span><%:html= plainText %></span>
 
-=item * SpiderMonkey (same engine as Mozilla Firefox):
+=item * xml
 
-L<JavaScript>
+    <xml><%:xml= plainText %></xml>
 
-L<JavaScript::SpiderMonkey>
+=item * uri
 
-=item * Pure Perl implementation
+    <a href="http://example.com?name=<%:uri= value %>">Link</a>
 
-L<JE>
+=item * quote
+
+    <script type="text/javascript">
+      var text = "<%:quote= value %>";
+    </script>
+
+=item * raw
+
+    <div><%:raw= htmlText %></div>
 
 =back
 
-It is also possible to specify a particular engine:
-
-   EJS::Template->new(engine => 'JE')->process(...);
 
 =head2 Trimming white spaces
 
@@ -240,6 +283,95 @@ Output:
 Note: If no white spaces were trimmed, the result output would look much more ugly,
 because of extra indent spaces and line breaks around C<< <% for (...) %> >>,
 C<< <% if (...) %> >>, etc.
+
+The trimming occurs only when C<< <% >> is at the beginning of a line with any indent
+spaces, and its corresponding C<< %> >> is at the end of the same or another line
+with any trailing spaces.
+
+When the above trimming condition is met,
+any white spaces to the left of C<< <% >> (not including any line breaks) and
+any white spaces to the right of C<< %> >> (including the line break) are trimmed.
+
+=head2 Data conversion between Perl and EJS
+
+In the current version, the data conversion is limited to basic types
+(strings, numbers, hashes, arrays, and functions), although arbitrarily nested
+structures are allowed.
+
+    EJS::Template::process('sample.ejs', {
+        name => 'World',
+        hash => {foo => 123, bar => 456, baz => [7, 8, 9]},
+        array => ['a'..'z'],
+        square => sub {
+            my $value = shift;
+            return $value * $value;
+        }
+    });
+
+If a blessed reference in Perl is passed to EJS, it is converted into a basic type.
+
+If a Perl subroutine is invoked from inside EJS, the types of the arguments depend
+on the JavaScript engine that is in use internally (See L<#JavaScript Engines>).
+
+    # Perl
+    sub printRefs {
+        print(ref($_) || '(scalar)', "\n") foreach @_;
+    }
+    
+    EJS::Template->process(\<<END, {printRefs => \&printRefs});
+    <%
+      printRefs(
+        'str',
+        123,
+        [4, 5, 6],
+        {x: 7, y: 8},
+        function () {return 90}
+      );
+    %>
+    END
+    
+    # Output with JavaScript::V8
+    (scalar)
+    (scalar)
+    ARRAY
+    HASH
+    CODE
+    
+    # Output with JE
+    JE::String
+    JE::Number
+    JE::Object::Array
+    JE::Object
+    JE::Object::Function
+
+For portability, it is recommended to keep data types as simple as possible
+when data is passed between Perl and EJS.
+
+=head2 JavaScript Engines
+
+C<EJS::Template> automatically determines the available JavaScript engine from the below:
+
+=over 4
+
+=item * V8 (same engine as Google Chrome):
+
+L<JavaScript::V8> (default for C<EJS::Template>)
+
+=item * SpiderMonkey (same engine as Mozilla Firefox):
+
+L<JavaScript>
+
+L<JavaScript::SpiderMonkey>
+
+=item * Pure Perl implementation
+
+L<JE>
+
+=back
+
+It is also possible to specify a particular engine:
+
+   EJS::Template->new(engine => 'JE')->process(...);
 
 =head1 AUTHOR
 
