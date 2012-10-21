@@ -111,6 +111,29 @@ sub process {
 	$self->execute(\$parsed, $variables, $output);
 }
 
+=head2 apply
+
+Usage:
+
+    EJS::Template->apply(INPUT_TEXT [, VARIABLES]) => OUTPUT_TEXT
+
+Example:
+
+    my $text = EJS::Template->apply('Hello <%= name %>', {name => 'World'});
+    print $text;
+
+This method serves as a syntax sugar for the C<process()> method, focused on
+text-to-text conversion.
+
+=cut
+
+sub apply {
+	my ($self, $input, $variables) = @_;
+	my $output;
+	$self->process(\$input, $variables, \$output);
+	return $output;
+}
+
 =head2 parse
 
 Usage:
