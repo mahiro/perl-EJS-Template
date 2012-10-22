@@ -62,13 +62,13 @@ sub new {
 	return $self;
 }
 
-=head2 handle_line
+=head2 read_line
 
 Parses a line.
 
 =cut
 
-sub handle_line {
+sub read_line {
 	my ($self, $line) = @_;
 	
 	while ($line =~ m{(.*?)((^\s*)?<%(?:(?:\s*:\s*\w+\s*)?=)?|%>(\s*?(?:\n|$))?|["']|/\*|\*/|//|\n|$)}g) {

@@ -20,7 +20,7 @@ sub parse {
 	
 	while (my $line = <$in>) {
 		$line =~ s/\r+\n?$/\n/;
-		$context->handle_line($line);
+		$context->read_line($line);
 	}
 	
 	close $in if $in_close;

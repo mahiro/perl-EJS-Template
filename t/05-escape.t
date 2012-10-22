@@ -2,37 +2,27 @@
 
 use Test::More tests => 5;
 
-use Carp qw(croak);
-use EJS::Template;
-use Test::Builder;
+use EJS::Template::Test;
 
-sub ejs_ok {
-	my ($source, $escape, $variables, $expected) = @_;
-	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	my $output;
-	EJS::Template->new(escape => $escape)->process(\$source, $variables, \$output) or croak $@;
-	is($output, $expected, "source: [$source]");
-}
-
-ejs_ok(<<EJS, 'html', undef, <<OUT);
+ejs_test(<<EJS, <<OUT, undef, {escape => 'html'});
 <span><%= "x > y" %></span>
 EJS
 <span>x &gt; y</span>
 OUT
 
-ejs_ok(<<EJS, 'html', undef, <<OUT);
+ejs_test(<<EJS, <<OUT, undef, {escape => 'html'});
 <span title='<%= "'x > y'" %>'>test</span>
 EJS
 <span title='&#39;x &gt; y&#39;'>test</span>
 OUT
 
-ejs_ok(<<EJS, 'html', {url => 'http://example.com?test'}, <<OUT);
+ejs_test(<<EJS, <<OUT, {url => 'http://example.com?test'}, {escape => 'html'});
 <a href="?redirect=<%:uri= url %>">Redirect</a>
 EJS
 <a href="?redirect=http%3A%2F%2Fexample.com%3Ftest">Redirect</a>
 OUT
 
-ejs_ok(<<EJS, 'html', {message => '<p>Hello World</p>'}, <<OUT);
+ejs_test(<<EJS, <<OUT, {message => '<p>Hello World</p>'}, {escape => 'html'});
 <div>
   <%:raw= message %>
 </div>
@@ -42,7 +32,7 @@ EJS
 </div>
 OUT
 
-ejs_ok(<<EJS, 'html', {message => 'Hello "World"'}, <<OUT);
+ejs_test(<<EJS, <<OUT, {message => 'Hello "World"'}, {escape => 'html'});
 <script>
 var message = "<%:quote= message %>";
 </script>

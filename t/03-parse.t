@@ -2,39 +2,30 @@
 
 use Test::More tests => 20;
 
-use EJS::Template;
-use Test::Builder;
+use EJS::Template::Test;
 
-sub parse_is {
-	my ($source, $expected) = @_;
-	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	my $output;
-	EJS::Template->parse(\$source, \$output) or die $@;
-	is($output, $expected, "source: [$source]");
-}
+ejs_test_parse('', '');
+ejs_test_parse('  ', 'print("  ");');
 
-parse_is('', '');
-parse_is('  ', 'print("  ");');
+ejs_test_parse('<%'       , ''     );
+ejs_test_parse('<%  '     , '  '   );
+ejs_test_parse('<% %>'    , ' '    );
+ejs_test_parse('<% %>  '  , '   '  );
+ejs_test_parse('  <%'     , '  '   );
+ejs_test_parse('  <%  '   , '    ' );
+ejs_test_parse('  <% %>'  , '   '  );
+ejs_test_parse('  <% %>  ', '     ');
 
-parse_is('<%'       , ''     );
-parse_is('<%  '     , '  '   );
-parse_is('<% %>'    , ' '    );
-parse_is('<% %>  '  , '   '  );
-parse_is('  <%'     , '  '   );
-parse_is('  <%  '   , '    ' );
-parse_is('  <% %>'  , '   '  );
-parse_is('  <% %>  ', '     ');
+ejs_test_parse('<%='       , 'print();'                         );
+ejs_test_parse('<%=  '     , 'print(  );'                       );
+ejs_test_parse('<%= %>'    , 'print( );'                        );
+ejs_test_parse('<%= %>  '  , 'print( );print("  ");'            );
+ejs_test_parse('  <%='     , 'print("  ");print();'             );
+ejs_test_parse('  <%=  '   , 'print("  ");print(  );'           );
+ejs_test_parse('  <%= %>'  , 'print("  ");print( );'            );
+ejs_test_parse('  <%= %>  ', 'print("  ");print( );print("  ");');
 
-parse_is('<%='       , 'print();'                         );
-parse_is('<%=  '     , 'print(  );'                       );
-parse_is('<%= %>'    , 'print( );'                        );
-parse_is('<%= %>  '  , 'print( );print("  ");'            );
-parse_is('  <%='     , 'print("  ");print();'             );
-parse_is('  <%=  '   , 'print("  ");print(  );'           );
-parse_is('  <%= %>'  , 'print("  ");print( );'            );
-parse_is('  <%= %>  ', 'print("  ");print( );print("  ");');
-
-parse_is(<<__EJS__, <<__OUT__);
+ejs_test_parse(<<__EJS__, <<__OUT__);
 Line 1
   <% var x %>\t
 Line 2
@@ -44,7 +35,7 @@ print("Line 1\\n");
 print("Line 2\\n");
 __OUT__
 
-parse_is(<<__EJS__, <<__OUT__);
+ejs_test_parse(<<__EJS__, <<__OUT__);
 Line 1
   <%= x %>\t
 Line 2
