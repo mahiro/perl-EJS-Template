@@ -21,3 +21,4 @@ t/02-engines.t
 t/03-parse.t
 t/04-trimming.t
 t/05-escape.t
+t/06-quote.t

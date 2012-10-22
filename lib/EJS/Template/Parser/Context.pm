@@ -71,7 +71,7 @@ Parses a line.
 sub read_line {
 	my ($self, $line) = @_;
 	
-	while ($line =~ m{(.*?)((^\s*)?<%(?:(?:\s*:\s*\w+\s*)?=)?|%>(\s*?(?:\n|$))?|["']|/\*|\*/|//|\n|$)}g) {
+	while ($line =~ m{(.*?)((^\s*)?<%(?:(?:\s*:\s*\w+\s*)?=)?|%>(\s*?(?:\n|$))?|\\?["']|/\*|\*/|//|\n|$)}g) {
 		my ($text, $mark, $left, $right) = ($1, $2, $3, $4);
 		my $escape;
 		
