@@ -387,7 +387,7 @@ In the current version, the data conversion is limited to basic types
 (strings, numbers, hashes, arrays, and functions), although arbitrarily nested
 structures are allowed.
 
-    EJS::Template::process('sample.ejs', {
+    EJS::Template->process('sample.ejs', {
         name => 'World',
         hash => {foo => 123, bar => 456, baz => [7, 8, 9]},
         array => ['a'..'z'],
@@ -511,7 +511,7 @@ ideas and inspirations.
 
 =over 4
 
-=item * Template::Toolkit (a.k.a. TT)
+=item * Template Toolkit (a.k.a. TT)
 
 L<Template::Toolkit>
 
