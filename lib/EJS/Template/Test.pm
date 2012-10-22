@@ -12,6 +12,10 @@ use Test::More;
 
 our @EXPORT = qw(ejs_test ejs_test_parse);
 
+=head2 ejs_test
+
+=cut
+
 sub ejs_test {
 	my ($source, $expected, $variables, $config) = @_;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -39,6 +43,10 @@ sub ejs_test {
 		is($output, $expected, $prefix."[$source]");
 	}
 }
+
+=head2 ejs_test_parse
+
+=cut
 
 sub ejs_test_parse {
 	my ($source, $expected) = @_;

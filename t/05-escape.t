@@ -1,8 +1,16 @@
 #!perl -T
+use strict;
+use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use EJS::Template::Test;
+
+ejs_test(<<EJS, <<OUT, undef, {escape => 'raw'});
+expr: <%= "x > y" %>
+EJS
+expr: x > y
+OUT
 
 ejs_test(<<EJS, <<OUT, undef, {escape => 'html'});
 <span><%= "x > y" %></span>

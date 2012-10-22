@@ -1,4 +1,6 @@
 #!perl -T
+use strict;
+use warnings;
 
 my $tests; BEGIN {$tests = 21}
 use EJS::Template::JSEngine;
