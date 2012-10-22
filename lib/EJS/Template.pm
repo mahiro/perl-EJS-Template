@@ -21,6 +21,9 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
+Anything inside the tag C<< <%...%> >> is executed as JavaScript code,
+and anything inside the tag C<< <%=...%> >> is replaced by the evaluated value.
+
     # Perl
     use EJS::Template;
     EJS::Template->process('source.ejs', {name => 'World'});
@@ -35,24 +38,57 @@ our $VERSION = '0.01';
     Hello, World!
     Hello, World!
 
-Anything inside the C<< <%...%> >> tag is executed as JavaScript code,
-and anything inside the C<< <%=...%> >> tag is replaced by the evaluated value.
+A simpler way to apply a template without an external file looks something like this:
+
+    my $text = EJS::Template->apply('Hello, <%= name %>!', {name => 'World'});
 
 Within C<< <%...%> >>, it is also possible to call C<print()> function:
 
     # EJS
     <%
-      for (var i = 0; i <= 5; i++) {
-        if (i % 2 == 1) {
-          print("i = ", i, "\n");
-        }
+      for (var i = 0; i < 3; i++) {
+        print("i = ", i, "\n");
       }
     %>
     
     # Output
+    i = 0
     i = 1
-    i = 3
-    i = 5
+    i = 2
+
+C<EJS::Template> supports auto-escaping that minimizes the risk of forgetting
+HTML-escape every individual variable. (See L<#Auto-escaping> for more details.)
+
+    # Perl
+    my $ejs = EJS::Template->new(escape => 'html'); # Set default escape type
+    
+    $ejs->process('sample.ejs', {
+        address => '"Foo Bar" <foo.bar@example.com>', # to be escaped
+        message => '<p>Hello, <i>World</i>!<p>', # not to be escaped
+    });
+    
+    # EJS ('<%=' escapes the value, while '<%:raw=' does *not*)
+    <h2><%= address %></h2>
+    <div>
+      <%:raw= message %>
+    </div>
+    
+    # Output
+    <h2>&quot;Foo Bar&quot; &lt;foo.bar@example.com&gt;</h2>
+    <div>
+      <p>Hello, <i>World</i>!</p>
+    </div>
+
+Extra white spaces around C<< <% >> and C<< %> >> are appropriately trimmed
+so that the result output will look fairly clean intuitively.
+See L<#Trimming white spaces> for more details.
+
+    <ul>
+    v-- Indent would make unnecessary space in the output.
+      <% for (...) { %>
+        <li>...</li>   ^-- This line break would make an extra empty line where <%...%> is gone.
+      <% } %>
+    </ul>
 
 =head1 DESCRIPTION
 
@@ -63,19 +99,43 @@ configurations, source code, etc.
 For web applications, EJS can be used as a template of HTML.
 
 EJS is suitable when template authors should not embed potentially dangerous
-code such as file system manipulations, command executions, and database connections,
-while at the same time, they can still utilize JavaScript as a well-established
-programming language.
+code such as file system manipulations, command executions, and database
+connections, while at the same time, they can still utilize JavaScript as a
+well-established programming language.
+
+Especially for web applications, there are several different approaches to
+implement similar EJS functionality, such as parsing EJS and/or executing
+JavaScript on the server side or the browser side.
+This module implements both parsing and executing on the server side from that
+perspective.
 
 =head1 METHODS
 
 =head2 new
 
-Creates a C<EJS::Template> object with configuration name/value pairs.
+Creates an C<EJS::Template> object with configuration name/value pairs.
 
 Usage:
 
    my $ejs = EJS::Template->new( [NAME => VALUE, ...] );
+
+Available configurations are as below:
+
+=over 4
+
+=item * escape => ESCAPE_TYPE
+
+Sets the default escape type for all the interpolation tags (C<< <%=...%> >>).
+
+Possible values are: C<'raw'> (default), C<'html'>, C<'xml'>, C<'uri'>, and
+C<'quote'>. See L<#Auto-escaping> for more details.
+
+=item * engine => ENGINE_CLASS
+
+Sets the JavaScript engine class.
+See L<#JavaScript engines> for more details.
+
+=back
 
 =cut
 
@@ -100,15 +160,19 @@ Usage:
     $ejs->process([INPUT [, VARIABLES [, OUTPUT ] ] ]);
 
 INPUT is the EJS source (default: STDIN).
+It can be either a string (as a file path), a string ref (as a source text), or
+an open file handle.
 
-VARIABLES is a hash ref that maps variable names to values bound to JavaScript
-(default: an empty hash).
+VARIABLES is a hash ref that maps variable names to values, which are made
+available in the JavaScript code (default: an empty hash).
 The values of VARIABLES can be a nested structure of hashes, arrays, strings,
 numbers, and/or subroutine refs.
+A function (subroutine) named C<print> is automatically defined, unless
+overwritten in VARIABLES.
 
 OUTPUT is where the final result is written out (default: STDOUT).
-
-See the examples below for possible types of INPUT and OUTPUT.
+It can be either a string (as a file path), a string ref (as a source text), or
+an open file handle.
 
 Examples:
 
@@ -141,7 +205,7 @@ sub process {
 
 Usage:
 
-    EJS::Template->apply(INPUT_TEXT [, VARIABLES]) => OUTPUT_TEXT
+    EJS::Template->apply(INPUT_TEXT [, VARIABLES])
 
 Example:
 
@@ -172,7 +236,8 @@ Usage:
     EJS::Template->parse([INPUT [, OUTPUT ] ]);
 
 INPUT is the EJS source, and OUTPUT is a JavaScript code,
-which can then be executed to generate the final output (see C<execute()> method).
+which can then be executed to generate the final output.
+(See C<execute()> method.)
 
 The parsed code can be stored in a file as an intermediate code,
 and can be executed at a later time.
@@ -218,11 +283,13 @@ sub execute {
 	return 1;
 }
 
+
 =head1 DETAILS
 
 =head2 Auto-escaping
 
-C<EJS::Template> supports auto-escaping if it is enabled via the C<new()> method.
+C<EJS::Template> supports auto-escaping if it is configured via the C<new()>
+method.
 
     EJS::Template->new(escape => 'html')->process(...);
 
@@ -268,7 +335,6 @@ In addition, the following escape types are available in a similar manner
     <div><%:raw= htmlText %></div>
 
 =back
-
 
 =head2 Trimming white spaces
 
@@ -370,9 +436,10 @@ on the JavaScript engine that is in use internally (See L<#JavaScript Engines>).
 For portability, it is recommended to keep data types as simple as possible
 when data is passed between Perl and EJS.
 
-=head2 JavaScript Engines
+=head2 JavaScript engines
 
-C<EJS::Template> automatically determines the available JavaScript engine from the below:
+C<EJS::Template> automatically determines the available JavaScript engine from
+the below:
 
 =over 4
 
