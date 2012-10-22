@@ -32,7 +32,6 @@ sub execute {
 			local $/;
 			
 			if (defined(my $js = <$in>)) {
-				local $@;
 				$ret = $engine->eval($js);
 				die $@ if $@;
 			} else {

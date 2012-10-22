@@ -16,18 +16,30 @@ sub parse {
 	my ($self, $input, $output) = @_;
 	my ($in, $in_close) = EJS::Template::IO->input($input);
 	
-	my $context = EJS::Template::Parser::Context->new($self->config);
+	my $context;
 	
-	while (my $line = <$in>) {
-		$line =~ s/\r+\n?$/\n/;
-		$context->read_line($line);
-	}
+	eval {
+		$context = EJS::Template::Parser::Context->new($self->config);
+		
+		while (my $line = <$in>) {
+			$line =~ s/\r+\n?$/\n/;
+			$context->read_line($line);
+		}
+	};
 	
+	my $e = $@;
 	close $in if $in_close;
+	die $e if $e;
 	
 	my ($out, $out_close) = EJS::Template::IO->output($output);
-	print $out $_ foreach @{$context->result};
+	
+	eval {
+		print $out $_ foreach @{$context->result};
+	};
+	
+	$e = $@;
 	close $out if $out_close;
+	die $e if $e;
 	
 	return 1;
 }

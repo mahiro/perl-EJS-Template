@@ -126,9 +126,15 @@ Examples:
 
 sub process {
 	my ($self, $input, $variables, $output) = @_;
-	my $parsed;
-	$self->parse($input, \$parsed);
-	$self->execute(\$parsed, $variables, $output);
+	
+	eval {
+		my $parsed;
+		$self->parse($input, \$parsed);
+		$self->execute(\$parsed, $variables, $output);
+	};
+	
+	die $@ if $@;
+	return 1;
 }
 
 =head2 apply
@@ -150,7 +156,12 @@ text-to-text conversion.
 sub apply {
 	my ($self, $input, $variables) = @_;
 	my $output;
-	$self->process(\$input, $variables, \$output);
+	
+	eval {
+		$self->process(\$input, $variables, \$output);
+	};
+	
+	die $@ if $@;
 	return $output;
 }
 
@@ -172,8 +183,14 @@ The semantics of INPUT and OUTPUT types are similar to C<process()>.
 
 sub parse {
 	my ($self, $input, $parsed_output) = @_;
-	my $parser = EJS::Template::Parser->new($self);
-	$parser->parse($input, $parsed_output);
+	
+	eval {
+		my $parser = EJS::Template::Parser->new($self);
+		$parser->parse($input, $parsed_output);
+	};
+	
+	die $@ if $@;
+	return 1;
 }
 
 =head2 execute
@@ -191,8 +208,14 @@ The semantics of INPUT and OUTPUT types are similar to C<process()>.
 
 sub execute {
 	my ($self, $parsed_input, $variables, $output) = @_;
-	my $executor = EJS::Template::Executor->new($self);
-	$executor->execute($parsed_input, $variables, $output);
+	
+	eval {
+		my $executor = EJS::Template::Executor->new($self);
+		$executor->execute($parsed_input, $variables, $output);
+	};
+	
+	die $@ if $@;
+	return 1;
 }
 
 =head1 DETAILS
