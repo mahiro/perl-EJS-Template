@@ -7,7 +7,7 @@ use base 'EJS::Template::JSEngine';
 
 use Encode;
 use JavaScript;
-use Scalar::Util qw(reftype);
+use Scalar::Util qw(reftype tainted);
 
 =head2 new
 
@@ -55,7 +55,8 @@ sub bind {
 			}
 		} else {
 			#$context->bind_value($path, $$source_ref);
-			JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$source_ref);
+			JavaScript::Context::jsc_bind_value($context, $parent_path, $name,
+					tainted($$source_ref) ? do {$$source_ref =~ /(.*)/s; $1} : $$source_ref);
 		}
 	};
 	
