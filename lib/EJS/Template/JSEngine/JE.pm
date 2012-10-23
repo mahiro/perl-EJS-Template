@@ -5,8 +5,8 @@ use warnings;
 package EJS::Template::JSEngine::JE;
 use base 'EJS::Template::JSEngine';
 
-use Scalar::Util qw(reftype);
 use JE;
+use Scalar::Util qw(reftype);
 
 =head2 new
 
@@ -26,28 +26,34 @@ sub bind {
 	my ($self, $variables) = @_;
 	my $context = $self->context;
 	
+	my $assign_value;
 	my $assign_hash;
 	my $assign_array;
+	
+	$assign_value = sub {
+		my ($target_ref, $source_ref) = @_;
+		my $reftype = reftype $$source_ref;
+		
+		if ($reftype) {
+			if ($reftype eq 'HASH') {
+				$assign_hash->($$target_ref = {}, $$source_ref);
+			} elsif ($reftype eq 'ARRAY') {
+				$assign_array->($$target_ref = [], $$source_ref);
+			} elsif ($reftype eq 'CODE') {
+				$$target_ref = $$source_ref;
+			} else {
+				# ignore?
+			}
+		} else {
+			$$target_ref = $$source_ref;
+		}
+	};
 	
 	$assign_hash = sub {
 		my ($target, $source) = @_;
 		
 		for my $name (keys %$source) {
-			my $ref = reftype $source->{$name};
-			
-			if ($ref) {
-				if ($ref eq 'HASH') {
-					$assign_hash->($target->{$name} = {}, $source->{$name});
-				} elsif ($ref eq 'ARRAY') {
-					$assign_array->($target->{$name} = [], $source->{$name});
-				} elsif ($ref eq 'CODE') {
-					$target->{$name} = $source->{$name};
-				} else {
-					# ignore?
-				}
-			} else {
-				$target->{$name} = $source->{$name};
-			}
+			$assign_value->(\$target->{$name}, \$source->{$name});
 		}
 	};
 	
@@ -56,21 +62,7 @@ sub bind {
 		my $len = scalar(@$source);
 		
 		for (my $i = 0; $i < $len; $i++) {
-			my $ref = reftype $source->[$i];
-			
-			if ($ref) {
-				if ($ref eq 'HASH') {
-					$assign_hash->($target->[$i] = {}, $source->[$i]);
-				} elsif ($ref eq 'ARRAY') {
-					$assign_array->($target->[$i] = [], $source->[$i]);
-				} elsif ($ref eq 'CODE') {
-					$target->[$i] = $source->[$i];
-				} else {
-					# ignore?
-				}
-			} else {
-				$target->[$i] = $source->[$i];
-			}
+			$assign_value->(\$target->[$i], \$source->[$i]);
 		}
 	};
 	
