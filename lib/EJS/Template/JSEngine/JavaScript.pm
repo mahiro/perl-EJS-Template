@@ -33,10 +33,12 @@ sub bind {
 	my $assign_array;
 	
 	$assign_value = sub {
-		my ($parent_path, $name, $source_ref) = @_;
+		my ($parent_path, $name, $source_ref, $in_array) = @_;
 		
 		my $reftype = reftype $$source_ref;
-		my $path = $parent_path ? "$parent_path.$name" : $name;
+		
+		my $path = $parent_path ne '' ?
+				($in_array ? "$parent_path\[$name]" : "$parent_path.$name") : $name;
 		
 		if ($reftype) {
 			if ($reftype eq 'HASH') {
@@ -73,7 +75,7 @@ sub bind {
 		my $len = scalar(@$source);
 		
 		for (my $i = 0; $i < $len; $i++) {
-			$assign_value->($parent_path, $i, \$source->[$i]);
+			$assign_value->($parent_path, $i, \$source->[$i], 1);
 		}
 	};
 	
