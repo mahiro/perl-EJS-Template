@@ -27,36 +27,47 @@ sub bind {
 	my ($self, $variables) = @_;
 	my $context = $self->context;
 	
+	my $assign_value;
 	my $assign_hash;
 	my $assign_array;
+	
+	$assign_value = sub {
+		my ($obj, $parent_path, $name, $source_ref, $in_array) = @_;
+		
+		my $reftype = reftype $$source_ref;
+		my $path = $parent_path ? "$parent_path.$name" : $name;
+		
+		if ($reftype) {
+			if ($reftype eq 'HASH') {
+				my $new_obj = $context->object_by_path($path);
+				$assign_hash->($new_obj, $$source_ref, $path);
+			} elsif ($reftype eq 'ARRAY') {
+				my $new_obj = $context->array_by_path($path);
+				$assign_array->($new_obj, $$source_ref, $path);
+			} elsif ($reftype eq 'CODE') {
+				$context->function_set($name, $$source_ref, $obj);
+			} else {
+				# ignore?
+			}
+		} else {
+			if ($in_array) {
+				$context->array_set_element($obj, $name, $$source_ref);
+			} else {
+				if ($parent_path) {
+					$context->property_by_path($path, $$source_ref);
+				} else {
+					JavaScript::SpiderMonkey::JS_DefineProperty(
+						$context->{context}, $obj, $name, $$source_ref);
+				}
+			}
+		}
+	};
 	
 	$assign_hash = sub {
 		my ($obj, $source, $parent_path) = @_;
 		
 		for my $name (keys %$source) {
-			my $ref = reftype $source->{$name};
-			my $path = $parent_path ? "$parent_path.$name" : $name;
-			
-			if ($ref) {
-				if ($ref eq 'HASH') {
-					my $new_obj = $context->object_by_path($path);
-					$assign_hash->($new_obj, $source->{$name}, $path);
-				} elsif ($ref eq 'ARRAY') {
-					my $new_obj = $context->array_by_path($path);
-					$assign_array->($new_obj, $source->{$name}, $path);
-				} elsif ($ref eq 'CODE') {
-					$context->function_set($name, $source->{$name}, $obj);
-				} else {
-					# ignore?
-				}
-			} else {
-				if ($parent_path) {
-					$context->property_by_path($path, $source->{$name});
-				} else {
-					JavaScript::SpiderMonkey::JS_DefineProperty(
-						$context->{context}, $obj, $name, $source->{$name});
-				}
-			}
+			$assign_value->($obj, $parent_path, $name, \$source->{$name});
 		}
 	};
 	
@@ -65,24 +76,7 @@ sub bind {
 		my $len = scalar(@$source);
 		
 		for (my $i = 0; $i < $len; $i++) {
-			my $ref = reftype $source->[$i];
-			my $path = "$parent_path.$i";
-			
-			if ($ref) {
-				if ($ref eq 'HASH') {
-					my $new_obj = $context->object_by_path($path);
-					$assign_hash->($new_obj, $source->[$i], $path);
-				} elsif ($ref eq 'ARRAY') {
-					my $new_obj = $context->array_by_path($path);
-					$assign_array->($new_obj, $source->[$i], $path);
-				} elsif ($ref eq 'CODE') {
-					$context->function_set($i, $source->[$i], $obj);
-				} else {
-					# ignore?
-				}
-			} else {
-				$context->array_set_element($obj, $i, $source->[$i]);
-			}
+			$assign_value->($obj, $parent_path, $i, \$source->[$i], 1);
 		}
 	};
 	
