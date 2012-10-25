@@ -57,8 +57,22 @@ sub bind {
 			}
 		} else {
 			#$context->bind_value($path, $$source_ref);
-			JavaScript::Context::jsc_bind_value($context, $parent_path, $name,
-					tainted($$source_ref) ? do {$$source_ref =~ /(.*)/s; $1} : $$source_ref);
+			my $value_ref = $source_ref;
+			
+			if (Encode::is_utf8($$value_ref)) {
+				# UTF8 flag must be turned off. (Otherwise, segmentation fault occurs)
+				$value_ref = \Encode::encode_utf8($$value_ref);
+			} elsif ($$value_ref =~ /[\x80-\xFF]/) {
+				# All characters must be valid UTF8. (Otherwise, segmentation fault occurs)
+				$value_ref = \Encode::encode_utf8(Encode::decode_utf8($$value_ref));
+			}
+			
+			if (tainted($$value_ref)) {
+				$$value_ref =~ /(.*)/s;
+				$value_ref = \qq($1);
+			}
+			
+			JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$value_ref);
 		}
 	};
 	
