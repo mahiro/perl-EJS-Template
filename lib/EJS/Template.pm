@@ -141,11 +141,8 @@ See L<#JavaScript engines> for more details.
 
 sub new {
 	my ($class, %config) = @_;
-	
-	return bless {
-		engine => $config{engine} || 'JavaScript::V8',
-		escape => $config{escape} || '',
-	}, $class;
+	my $self = {map {$_ => $config{$_}} qw(engine escape)};
+	return bless $self, $class;
 }
 
 =head2 process
