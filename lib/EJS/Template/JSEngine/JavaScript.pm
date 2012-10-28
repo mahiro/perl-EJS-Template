@@ -5,9 +5,12 @@ use warnings;
 package EJS::Template::JSEngine::JavaScript;
 use base 'EJS::Template::JSEngine';
 
-use Encode;
 use JavaScript;
-use Scalar::Util qw(reftype tainted);
+use Scalar::Util qw(reftype);
+
+our $ENCODE_UTF8   = 1;
+our $SANITIZE_UTF8 = 1;
+our $FORCE_UNTAINT = 1;
 
 =head2 new
 
@@ -57,21 +60,7 @@ sub bind {
 			}
 		} else {
 			#$context->bind_value($path, $$source_ref);
-			my $value_ref = $source_ref;
-			
-			if (Encode::is_utf8($$value_ref)) {
-				# UTF8 flag must be turned off. (Otherwise, segmentation fault occurs)
-				$value_ref = \Encode::encode_utf8($$value_ref);
-			} elsif ($$value_ref =~ /[\x80-\xFF]/) {
-				# All characters must be valid UTF8. (Otherwise, segmentation fault occurs)
-				$value_ref = \Encode::encode_utf8(Encode::decode_utf8($$value_ref));
-			}
-			
-			if (tainted($$value_ref)) {
-				$$value_ref =~ /(.*)/s;
-				$value_ref = \qq($1);
-			}
-			
+			my $value_ref = $self->_fix_value($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
 			JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$value_ref);
 		}
 	};

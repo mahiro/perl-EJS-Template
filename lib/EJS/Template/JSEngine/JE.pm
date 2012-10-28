@@ -8,6 +8,10 @@ use base 'EJS::Template::JSEngine';
 use JE;
 use Scalar::Util qw(reftype);
 
+our $ENCODE_UTF8   = 1;
+our $SANITIZE_UTF8 = 0;
+our $FORCE_UNTAINT = 0;
+
 =head2 new
 
 =cut
@@ -45,7 +49,8 @@ sub bind {
 				# ignore?
 			}
 		} else {
-			$$target_ref = $$source_ref;
+			my $value_ref = $self->_fix_value($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
+			$$target_ref = $$value_ref;
 		}
 	};
 	

@@ -5,8 +5,12 @@ use warnings;
 package EJS::Template::JSEngine::JavaScript::SpiderMonkey;
 use base 'EJS::Template::JSEngine';
 
-use Scalar::Util qw(reftype);
 use JavaScript::SpiderMonkey;
+use Scalar::Util qw(reftype);
+
+our $ENCODE_UTF8   = 0;
+our $SANITIZE_UTF8 = 0;
+our $FORCE_UNTAINT = 0;
 
 =head2 new
 
@@ -35,7 +39,7 @@ sub bind {
 		my ($obj, $parent_path, $name, $source_ref, $in_array) = @_;
 		
 		my $reftype = reftype $$source_ref;
-		my $path = $parent_path ? "$parent_path.$name" : $name;
+		my $path = $parent_path ne '' ? "$parent_path.$name" : $name;
 		
 		if ($reftype) {
 			if ($reftype eq 'HASH') {
@@ -50,14 +54,16 @@ sub bind {
 				# ignore?
 			}
 		} else {
+			my $value_ref = $self->_fix_value($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
+			
 			if ($in_array) {
-				$context->array_set_element($obj, $name, $$source_ref);
+				$context->array_set_element($obj, $name, $$value_ref);
 			} else {
 				if ($parent_path) {
-					$context->property_by_path($path, $$source_ref);
+					$context->property_by_path($path, $$value_ref);
 				} else {
 					JavaScript::SpiderMonkey::JS_DefineProperty(
-						$context->{context}, $obj, $name, $$source_ref);
+						$context->{context}, $obj, $name, $$value_ref);
 				}
 			}
 		}

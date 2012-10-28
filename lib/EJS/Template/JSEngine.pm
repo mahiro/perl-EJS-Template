@@ -10,6 +10,8 @@ EJS::Template::JSEngine - JavaScript engine adapter for EJS::Template
 
 package EJS::Template::JSEngine;
 
+use Scalar::Util qw(tainted);
+
 our @SupportedEngines = qw(
 	JavaScript::V8
 	JavaScript
@@ -121,6 +123,27 @@ sub bind {
 			return $context->bind($variables);
 		}
 	}
+}
+
+sub _fix_value {
+	my ($self, $value_ref, $encode_utf8, $sanitize_utf8, $force_untaint) = @_;
+	
+	if (Encode::is_utf8($$value_ref)) {
+		if ($encode_utf8) {
+			# UTF8 flag must be turned off. (Otherwise, segmentation fault occurs)
+			$value_ref = \Encode::encode_utf8($$value_ref);
+		}
+	} elsif ($sanitize_utf8 && $$value_ref =~ /[\x80-\xFF]/) {
+		# All characters must be valid UTF8. (Otherwise, segmentation fault occurs)
+		$value_ref = \Encode::encode_utf8(Encode::decode_utf8($$value_ref));
+	}
+	
+	if ($force_untaint && tainted($$value_ref)) {
+		$$value_ref =~ /(.*)/s;
+		$value_ref = \qq($1);
+	}
+	
+	return $value_ref;
 }
 
 =head2 eval

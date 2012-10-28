@@ -8,6 +8,10 @@ use base 'EJS::Template::JSEngine';
 use JavaScript::V8;
 use Scalar::Util qw(reftype tainted);
 
+our $ENCODE_UTF8   = 1;
+our $SANITIZE_UTF8 = 0;
+our $FORCE_UNTAINT = 1;
+
 =head2 new
 
 =cut
@@ -45,8 +49,8 @@ sub bind {
 				# ignore?
 			}
 		} else {
-			$$target_ref = tainted($$source_ref) ?
-					do {$$source_ref =~ /(.*)/s; $1} : $$source_ref;
+			my $value_ref = $self->_fix_value($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
+			$$target_ref = $$value_ref;
 		}
 	};
 	
