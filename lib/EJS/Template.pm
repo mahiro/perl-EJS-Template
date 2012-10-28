@@ -57,7 +57,7 @@ Within C<< <%...%> >>, it is also possible to call C<print()> function:
     i = 2
 
 C<EJS::Template> supports auto-escaping that minimizes the risk of forgetting
-HTML-escape every individual variable. (See L<#Auto-escaping> for more details.)
+HTML-escape every individual variable. (See L</Auto-escaping> for more details.)
 
     # Perl
     my $ejs = EJS::Template->new(escape => 'html'); # Set default escape type
@@ -81,7 +81,7 @@ HTML-escape every individual variable. (See L<#Auto-escaping> for more details.)
 
 Extra white spaces around C<< <% >> and C<< %> >> are appropriately trimmed
 so that the result output will look fairly clean intuitively.
-See L<#Trimming white spaces> for more details.
+See L</Trimming white spaces> for more details.
 
     <ul>
     v-- Indent would make unnecessary space in the output.
@@ -128,12 +128,12 @@ Available configurations are as below:
 Sets the default escape type for all the interpolation tags (C<< <%=...%> >>).
 
 Possible values are: C<'raw'> (default), C<'html'>, C<'xml'>, C<'uri'>, and
-C<'quote'>. See L<#Auto-escaping> for more details.
+C<'quote'>. See L</Auto-escaping> for more details.
 
 =item * engine => ENGINE_CLASS
 
 Sets the JavaScript engine class.
-See L<#JavaScript engines> for more details.
+See L</JavaScript engines> for more details.
 
 =back
 
@@ -397,7 +397,7 @@ structures are allowed.
 If a blessed reference in Perl is passed to EJS, it is converted into a basic type.
 
 If a Perl subroutine is invoked from inside EJS, the types of the arguments depend
-on the JavaScript engine that is in use internally (See L<#JavaScript Engines>).
+on the JavaScript engine that is in use internally (See L</JavaScript engines>).
 
     # Perl
     sub printRefs {
