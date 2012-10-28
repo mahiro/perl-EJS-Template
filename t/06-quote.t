@@ -23,13 +23,13 @@ outer: ' \\' " \\"
 OUT
 
 ejs_test(<<EJS, <<OUT);
-print tags <%= "<%...%> and <%=...%>" %>
+print tags <%= "<", "%...%", "> and <", "%=...%", ">" %>
 EJS
 print tags <%...%> and <%=...%>
 OUT
 
 ejs_test(<<EJS, <<OUT);
-print tags <% print('<%...%> and <%=...%>'); %>
+print tags <% print('<', '%...%', '> and <', '%=...%', '>'); %>
 EJS
 print tags <%...%> and <%=...%>
 OUT

@@ -23,16 +23,6 @@ my $states = {
 		key => '<%=' , method => '_in_script',
 		js_open => 'print(' , js_close => ');',
 	},
-	'"' => {
-		key => '"', method => '_in_quote',
-		js_open => '"', js_close => '"',
-	},
-	"'" => {
-		key => "'", method => '_in_quote',
-		js_open => "'", js_close => "'",
-	},
-	'/*' => {},
-	'//' => {},
 };
 
 =head2 new
@@ -208,9 +198,7 @@ sub _in_text {
 sub _in_script {
 	my ($self, $token, $opt) = @_;
 	
-	if ($token eq '"' || $token eq "'") {
-		$self->_push_state($token);
-	} elsif ($token eq '%>') {
+	if ($token eq '%>') {
 		if (my $ltrim = $self->_top_opt->{ltrim}) {
 			if (defined $opt->{right}) {
 				if ($opt->{right} ne '') {
@@ -241,16 +229,6 @@ sub _in_script {
 				}
 			}
 		}
-	} else {
-		$self->_append_result($token);
-	}
-}
-
-sub _in_quote {
-	my ($self, $token, $opt) = @_;
-	
-	if ($token eq $self->_top_key) {
-		$self->_pop_state();
 	} else {
 		$self->_append_result($token);
 	}
