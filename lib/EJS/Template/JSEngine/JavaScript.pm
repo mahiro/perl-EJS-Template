@@ -5,6 +5,7 @@ use warnings;
 package EJS::Template::JSEngine::JavaScript;
 use base 'EJS::Template::JSEngine';
 
+use EJS::Template::Util qw(clean_text_ref);
 use JavaScript;
 use Scalar::Util qw(reftype);
 
@@ -59,9 +60,16 @@ sub bind {
 				# ignore?
 			}
 		} else {
+			# NOTE: Do NOT call a subroutine that takes $self as an argument here:
+			# E.g.
+			#   some_routine($self);
+			#   $self->some_method();
+			# If $self is passed as above, an odd memory leak occurs, detected by
+			# JavaScript::Context::DESTROY
+			
 			#$context->bind_value($path, $$source_ref);
-			my $value_ref = $self->_fix_value($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
-			JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$value_ref);
+			my $text_ref = clean_text_ref($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
+			JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$text_ref);
 		}
 	};
 	

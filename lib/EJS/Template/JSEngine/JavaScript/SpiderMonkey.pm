@@ -5,6 +5,7 @@ use warnings;
 package EJS::Template::JSEngine::JavaScript::SpiderMonkey;
 use base 'EJS::Template::JSEngine';
 
+use EJS::Template::Util qw(clean_text_ref);
 use JavaScript::SpiderMonkey;
 use Scalar::Util qw(reftype);
 
@@ -54,16 +55,16 @@ sub bind {
 				# ignore?
 			}
 		} else {
-			my $value_ref = $self->_fix_value($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
+			my $text_ref = clean_text_ref($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
 			
 			if ($in_array) {
-				$context->array_set_element($obj, $name, $$value_ref);
+				$context->array_set_element($obj, $name, $$text_ref);
 			} else {
 				if ($parent_path) {
-					$context->property_by_path($path, $$value_ref);
+					$context->property_by_path($path, $$text_ref);
 				} else {
 					JavaScript::SpiderMonkey::JS_DefineProperty(
-						$context->{context}, $obj, $name, $$value_ref);
+						$context->{context}, $obj, $name, $$text_ref);
 				}
 			}
 		}

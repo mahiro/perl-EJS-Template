@@ -5,6 +5,7 @@ use warnings;
 package EJS::Template::JSEngine::JavaScript::V8;
 use base 'EJS::Template::JSEngine';
 
+use EJS::Template::Util qw(clean_text_ref);
 use JavaScript::V8;
 use Scalar::Util qw(reftype tainted);
 
@@ -49,8 +50,8 @@ sub bind {
 				# ignore?
 			}
 		} else {
-			my $value_ref = $self->_fix_value($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
-			$$target_ref = $$value_ref;
+			my $text_ref = clean_text_ref($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
+			$$target_ref = $$text_ref;
 		}
 	};
 	
