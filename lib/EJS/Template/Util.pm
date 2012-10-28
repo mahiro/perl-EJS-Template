@@ -12,6 +12,41 @@ use Scalar::Util qw(tainted);
 
 =head2 clean_text_ref
 
+Usage:
+
+    my $original_ref = \'some text';
+    my $modified_ref = clean_text_ref($original_ref,
+            $encode_utf8, $sanitize_utf8, $force_untaint);
+    
+    # where the last three arguments are boolean values
+    # to indicate whether each conversion is required.
+
+Depending on JavaScript engines, the text value passed from Perl to JavaScript
+needs to be cleaned up, especially related to the UTF8 flag and the taint mode.
+
+It takes a reference to the text as the first argument, and returns a reference
+to the modified text, of if no conversion is necessary, the original reference
+is returned.
+
+=over 4
+
+=item * $encode_utf8
+
+Indicates the text needs to be a utf8-encoded string, where the utf8 flag
+has to be turned off.
+
+=item * $sanitize_utf8
+
+Indicates the text cannot contain any invalid utf8 characters. The conversion
+is done by applying C<Encode::decode_utf8()> and then C<Encode::encode_utf8()>.
+
+=item * $force_untaint
+
+Indicates tainted strings cannot be passed to the JavaScript engine. This flag
+effectively disables the taint flag, trusting the JavaScript code to be safe.
+
+=back
+
 =cut
 
 sub clean_text_ref {
