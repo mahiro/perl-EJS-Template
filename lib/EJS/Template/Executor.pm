@@ -6,7 +6,7 @@ package EJS::Template::Executor;
 use base 'EJS::Template::Base';
 
 use EJS::Template::IO;
-use EJS::Template::JSEngine;
+use EJS::Template::JSAdapter;
 use EJS::Template::Runtime;
 
 =head2 execute
@@ -15,7 +15,7 @@ use EJS::Template::Runtime;
 
 sub execute {
 	my ($self, $input, $variables, $output) = @_;
-	my $engine = EJS::Template::JSEngine->create($self->{config}{engine});
+	my $engine = EJS::Template::JSAdapter->create($self->{config}{engine});
 	
 	my ($out, $out_close) = EJS::Template::IO->output($output);
 	my $ret;

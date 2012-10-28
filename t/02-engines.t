@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 my $tests; BEGIN {$tests = 25}
-use EJS::Template::JSEngine;
-use Test::More tests => 4 + $tests * scalar(@EJS::Template::JSEngine::SupportedEngines);
+use EJS::Template::JSAdapter;
+use Test::More tests => 4 + $tests * scalar(@EJS::Template::JSAdapter::SUPPORTED_ENGINES);
 
 use EJS::Template::Test;
 use EJS::Template::Util qw(clean_text_ref);
@@ -29,8 +29,8 @@ ok Encode::is_utf8($decoded_text);
 isnt Encode::decode_utf8($invalid_text), $invalid_text;
 ok tainted($tainted_text);
 
-for my $engine (@EJS::Template::JSEngine::SupportedEngines) {
-	eval {EJS::Template::JSEngine->create($engine)};
+for my $engine (@EJS::Template::JSAdapter::SUPPORTED_ENGINES) {
+	eval {EJS::Template::JSAdapter->create($engine)};
 	my $not_installed = $@;
 	
 	SKIP: {
@@ -86,7 +86,7 @@ for my $engine (@EJS::Template::JSEngine::SupportedEngines) {
 		
 		my $invalid_text_expected = do {
 			no strict 'refs';
-			(${"EJS::Template::JSEngine::".$engine."::SANITIZE_UTF8"} ?
+			(${"EJS::Template::JSAdapter::".$engine."::SANITIZE_UTF8"} ?
 					$sanitized_text : $invalid_text);
 		};
 		

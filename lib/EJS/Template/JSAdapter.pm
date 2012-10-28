@@ -4,13 +4,13 @@ use warnings;
 
 =head1 NAME
 
-EJS::Template::JSEngine - JavaScript engine adapter for EJS::Template
+EJS::Template::JSAdapter - JavaScript engine adapter for EJS::Template
 
 =cut
 
-package EJS::Template::JSEngine;
+package EJS::Template::JSAdapter;
 
-our @SupportedEngines = qw(
+our @SUPPORTED_ENGINES = qw(
 	JavaScript::V8
 	JavaScript
 	JavaScript::SpiderMonkey
@@ -25,13 +25,13 @@ my $default_engine;
 
 Instantiates a JavaScript engine adapter object.
 
-    my $engine = EJS::Template::JSEngine->create();
+    my $engine = EJS::Template::JSAdapter->create();
 
 If no argument is passed, an engine is selected from the available ones.
 
 An explicit engine can also be specified. E.g.
 
-    my $engine = EJS::Template::JSEngine->create('JE');
+    my $engine = EJS::Template::JSAdapter->create('JE');
 
 =cut
 
@@ -52,7 +52,7 @@ sub create {
 	} elsif ($default_engine) {
 		return $default_engine->new();
 	} else {
-		for my $candidate (@SupportedEngines) {
+		for my $candidate (@SUPPORTED_ENGINES) {
 			my $engine_class = $class.'::'.$candidate;
 			eval "require $engine_class";
 			next if $@;
@@ -72,8 +72,8 @@ Creates an adapter object.
 
 This method should be overridden, and a property named 'context' is expected to be set up.
 
-    package Some::Extended::JSEngine;
-    use base 'EJS::Template::JSEngine';
+    package Some::Extended::JSAdapter;
+    use base 'EJS::Template::JSAdapter';
     
     sub new {
         my ($class) = @_;

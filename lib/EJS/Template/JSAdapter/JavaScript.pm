@@ -2,8 +2,8 @@ use 5.006;
 use strict;
 use warnings;
 
-package EJS::Template::JSEngine::JavaScript;
-use base 'EJS::Template::JSEngine';
+package EJS::Template::JSAdapter::JavaScript;
+use base 'EJS::Template::JSAdapter';
 
 use EJS::Template::Util qw(clean_text_ref);
 use JavaScript;

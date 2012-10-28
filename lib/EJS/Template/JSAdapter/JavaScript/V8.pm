@@ -2,16 +2,16 @@ use 5.006;
 use strict;
 use warnings;
 
-package EJS::Template::JSEngine::JE;
-use base 'EJS::Template::JSEngine';
+package EJS::Template::JSAdapter::JavaScript::V8;
+use base 'EJS::Template::JSAdapter';
 
 use EJS::Template::Util qw(clean_text_ref);
-use JE;
-use Scalar::Util qw(reftype);
+use JavaScript::V8;
+use Scalar::Util qw(reftype tainted);
 
 our $ENCODE_UTF8   = 1;
 our $SANITIZE_UTF8 = 0;
-our $FORCE_UNTAINT = 0;
+our $FORCE_UNTAINT = 1;
 
 =head2 new
 
@@ -19,7 +19,7 @@ our $FORCE_UNTAINT = 0;
 
 sub new {
 	my ($class) = @_;
-	my $context = JE->new;
+	my $context = JavaScript::V8::Context->new();
 	return bless {context => $context}, $class;
 }
 
@@ -72,7 +72,13 @@ sub bind {
 		}
 	};
 	
-	$assign_hash->($context, $variables);
+	my $clone = {};
+	$assign_hash->($clone, $variables);
+	
+	for my $name (keys %$clone) {
+		$context->bind($name, $clone->{$name});
+	}
+	
 	return $context;
 }
 
