@@ -17,7 +17,7 @@ my $decoded_text = decode_utf8($encoded_text);
 my $invalid_text = "Invalid: \xFF";
 my $sanitized_text = "Invalid: \xEF\xBF\xBD";
 my $tainted_text = do {
-	open(my $in, dirname(__FILE__).'/tainted.txt') or die "$!: tainted.txt";
+	open(my $in, dirname(__FILE__).'/data/tainted.txt') or die "$!: tainted.txt";
 	local $/;
 	my $tmp = <$in>;
 	close $in;

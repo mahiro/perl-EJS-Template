@@ -14,6 +14,7 @@ lib/EJS/Template/JSEngine/JavaScript/V8.pm
 lib/EJS/Template/Parser.pm
 lib/EJS/Template/Parser/Context.pm
 lib/EJS/Template/Runtime.pm
+lib/EJS/Template/Util.pm
 lib/EJS/Template/Test.pm
 t/00-load.t
 t/01-process.t
@@ -22,3 +23,4 @@ t/03-parse.t
 t/04-trimming.t
 t/05-escape.t
 t/06-quote.t
+t/data/tainted.txt
