@@ -51,6 +51,8 @@ sub bind {
 				$assign_array->($new_obj, $$source_ref, $path);
 			} elsif ($reftype eq 'CODE') {
 				$context->function_set($name, $$source_ref, $obj);
+			} elsif ($reftype eq 'SCALAR') {
+				$assign_array->($obj, $parent_path, $name, $$source_ref, $in_array);
 			} else {
 				# ignore?
 			}

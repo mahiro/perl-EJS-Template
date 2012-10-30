@@ -56,6 +56,8 @@ sub bind {
 			} elsif ($reftype eq 'CODE') {
 				#$context->bind_function($path, $$source_ref);
 				JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$source_ref);
+			} elsif ($reftype eq 'SCALAR') {
+				$assign_value->($parent_path, $name, $$source_ref, $in_array);
 			} else {
 				# ignore?
 			}

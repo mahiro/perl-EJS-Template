@@ -46,6 +46,8 @@ sub bind {
 				$assign_array->($$target_ref = [], $$source_ref);
 			} elsif ($reftype eq 'CODE') {
 				$$target_ref = $$source_ref;
+			} elsif ($reftype eq 'SCALAR') {
+				$assign_value->($target_ref, $$source_ref);
 			} else {
 				# ignore?
 			}
