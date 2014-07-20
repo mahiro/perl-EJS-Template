@@ -2,6 +2,12 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::Test - Testing utility for EJS::Template
+
+=cut
+
 package EJS::Template::Test;
 use base 'Exporter';
 
@@ -11,6 +17,8 @@ use Test::Builder;
 use Test::More;
 
 our @EXPORT = qw(ejs_test ejs_test_parse);
+
+=head1 Methods
 
 =head2 ejs_test
 
@@ -65,5 +73,15 @@ sub ejs_test_parse {
         is($output, $expected, $prefix."[$source]");
     }
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=back
+
+=cut
 
 1;

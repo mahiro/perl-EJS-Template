@@ -2,6 +2,12 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::Runtime - Default functions that can be invoked from JavaScript
+
+=cut
+
 package EJS::Template::Runtime;
 use base 'EJS::Template::Base';
 
@@ -22,6 +28,8 @@ our %ESCAPES = qw(
     uri   escapeURI
     quote escapeQuote
 );
+
+=head1 Methods
 
 =head2 make_map
 
@@ -103,5 +111,15 @@ sub escapeQuote {
         $_;
     } @_);
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=back
+
+=cut
 
 1;

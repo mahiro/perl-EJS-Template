@@ -2,11 +2,21 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::Base - Base class for some EJS::Template classes to hold common config
+
+=cut
+
 package EJS::Template::Base;
 
 use Scalar::Util qw(reftype);
 
+=head1 Methods
+
 =head2 new
+
+Common constructor with the config
 
 =cut
 
@@ -17,6 +27,8 @@ sub new {
 }
 
 =head2 config
+
+Retrieves the config value.
 
 =cut
 
@@ -34,5 +46,15 @@ sub config {
     
     return $config;
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=back
+
+=cut
 
 1;

@@ -2,6 +2,12 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::JSAdapter::JavaScript::V8
+
+=cut
+
 package EJS::Template::JSAdapter::JavaScript::V8;
 use base 'EJS::Template::JSAdapter';
 
@@ -12,7 +18,11 @@ our $ENCODE_UTF8   = 1;
 our $SANITIZE_UTF8 = 0;
 our $FORCE_UNTAINT = 1;
 
+=head1 Methods
+
 =head2 new
+
+Creates an adapter object.
 
 =cut
 
@@ -24,6 +34,8 @@ sub new {
 }
 
 =head2 bind
+
+Implements the bind method.
 
 =cut
 
@@ -83,5 +95,19 @@ sub bind {
     
     return $context;
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=item * L<EJS::Template::JSAdapter>
+
+=item * L<JavaScript::V8>
+
+=back
+
+=cut
 
 1;

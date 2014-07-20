@@ -2,6 +2,12 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::JSAdapter::JavaScript::SpiderMonkey
+
+=cut
+
 package EJS::Template::JSAdapter::JavaScript::SpiderMonkey;
 use base 'EJS::Template::JSAdapter';
 
@@ -12,7 +18,11 @@ our $ENCODE_UTF8   = 0;
 our $SANITIZE_UTF8 = 0;
 our $FORCE_UNTAINT = 0;
 
+=head1 Methods
+
 =head2 new
+
+Creates an adapter object.
 
 =cut
 
@@ -25,6 +35,8 @@ sub new {
 }
 
 =head2 bind
+
+Implements the bind method.
 
 =cut
 
@@ -98,5 +110,19 @@ sub DESTROY {
     $self->{context}->destroy();
     delete $self->{context};
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=item * L<EJS::Template::JSAdapter>
+
+=item * L<JavaScript::SpiderMonkey>
+
+=back
+
+=cut
 
 1;

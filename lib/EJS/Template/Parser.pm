@@ -2,13 +2,28 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::Parser - Parser module for EJS::Template
+
+=cut
+
 package EJS::Template::Parser;
 use base 'EJS::Template::Base';
 
 use EJS::Template::IO;
 use EJS::Template::Parser::Context;
 
+=head1 Methods
+
 =head2 parse
+
+Parses EJS source and generates JavaScript code.
+
+    $parser->parser($input, $output);
+
+The C<$input> is used as the EJS source code, and the generated JavaScript code
+is written out to C<$output>.
 
 =cut
 
@@ -43,5 +58,15 @@ sub parse {
     
     return 1;
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=back
+
+=cut
 
 1;

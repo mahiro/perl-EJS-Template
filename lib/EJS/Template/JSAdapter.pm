@@ -10,6 +10,26 @@ EJS::Template::JSAdapter - JavaScript engine adapter for EJS::Template
 
 package EJS::Template::JSAdapter;
 
+=head1 Variables
+
+=head2 @SUPPORTED_ENGINES
+
+Supported JavaScript engine classes
+
+=over 4
+
+=item * L<JavaScript::V8>
+
+=item * L<JavaScript>
+
+=item * L<JavaScript::SpiderMonkey>
+
+=item * L<JE>
+
+=back
+
+=cut
+
 our @SUPPORTED_ENGINES = qw(
     JavaScript::V8
     JavaScript
@@ -31,7 +51,8 @@ If no argument is passed, an engine is selected from the available ones.
 
 An explicit engine can also be specified. E.g.
 
-    my $engine = EJS::Template::JSAdapter->create('JE');
+    my $je_engine = EJS::Template::JSAdapter->create('JE');
+    my $v8_engine = EJS::Template::JSAdapter->create('JavaScript::V8');
 
 =cut
 
@@ -142,5 +163,15 @@ sub eval {
         }
     }
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=back
+
+=cut
 
 1;

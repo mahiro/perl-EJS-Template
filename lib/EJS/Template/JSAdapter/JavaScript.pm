@@ -2,6 +2,12 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::JSAdapter::JavaScript
+
+=cut
+
 package EJS::Template::JSAdapter::JavaScript;
 use base 'EJS::Template::JSAdapter';
 
@@ -12,7 +18,11 @@ our $ENCODE_UTF8   = 1;
 our $SANITIZE_UTF8 = 1;
 our $FORCE_UNTAINT = 1;
 
+=head1 Methods
+
 =head2 new
+
+Creates an adapter object.
 
 =cut
 
@@ -25,6 +35,8 @@ sub new {
 }
 
 =head2 bind
+
+Implements the bind method.
 
 =cut
 
@@ -103,5 +115,19 @@ sub DESTROY {
     delete $self->{context};
     delete $self->{runtime};
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=item * L<EJS::Template::JSAdapter>
+
+=item * L<JavaScript>
+
+=back
+
+=cut
 
 1;

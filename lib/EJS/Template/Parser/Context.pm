@@ -1,6 +1,12 @@
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::Parser::Context - Implementation of EJS::Template::Parser
+
+=cut
+
 package EJS::Template::Parser::Context;
 use base 'EJS::Template::Base';
 
@@ -24,6 +30,8 @@ my $states = {
         js_open => 'print(' , js_close => ');',
     },
 };
+
+=head1 Methods
 
 =head2 new
 
@@ -88,7 +96,7 @@ sub read_line {
 
 =head2 result
 
-Retrieves the result.
+Retrieves the result (an array ref of the generated JavaScript texts).
 
 =cut
 
@@ -233,5 +241,17 @@ sub _in_script {
         $self->_append_result($token);
     }
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=item * L<EJS::Template::Parser>
+
+=back
+
+=cut
 
 1;

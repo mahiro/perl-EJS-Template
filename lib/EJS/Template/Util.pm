@@ -2,6 +2,12 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template::Util - Utility for EJS::Template
+
+=cut
+
 package EJS::Template::Util;
 use base 'Exporter';
 
@@ -9,6 +15,8 @@ our @EXPORT_OK = qw(clean_text_ref);
 
 use Encode;
 use Scalar::Util qw(tainted);
+
+=head1 Methods
 
 =head2 clean_text_ref
 
@@ -69,5 +77,15 @@ sub clean_text_ref {
     
     return $value_ref;
 }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<EJS::Template>
+
+=back
+
+=cut
 
 1;

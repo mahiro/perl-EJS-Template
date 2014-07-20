@@ -2,14 +2,16 @@ use 5.006;
 use strict;
 use warnings;
 
+=head1 NAME
+
+EJS::Template - EJS (Embedded JavaScript) template engine
+
+=cut
+
 package EJS::Template;
 
 use EJS::Template::Executor;
 use EJS::Template::Parser;
-
-=head1 NAME
-
-EJS::Template - EJS (Embedded JavaScript) template engine
 
 =head1 VERSION
 
@@ -21,8 +23,9 @@ our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
-Anything inside the tag C<< <%...%> >> is executed as JavaScript code,
-and anything inside the tag C<< <%=...%> >> is replaced by the evaluated value.
+EJS is a template with JavaScript code embedded. Anything inside the tag
+C<< <%...%> >> is executed as JavaScript code, and anything inside the tag
+C<< <%=...%> >> is replaced by the evaluated value.
 
     # Perl
     use EJS::Template;
@@ -33,12 +36,18 @@ and anything inside the tag C<< <%=...%> >> is replaced by the evaluated value.
     Hello, <%= name %>!
     <% } %>
     
-    # Output
+    # Output (STDOUT)
     Hello, World!
     Hello, World!
     Hello, World!
 
-A simpler way to apply a template without an external file looks something like this:
+The C<process()> method can optionally take both input and output targets (file
+paths, IO handles, or scalar refs to strings).
+
+    EJS::Template->process('source.ejs', {name => 'World'}, 'destination.ejs');
+
+A simpler way to apply a template without an external file is to use C<apply()>
+method, which looks something like this:
 
     my $text = EJS::Template->apply('Hello, <%= name %>!', {name => 'World'});
 
@@ -92,7 +101,8 @@ See L</Trimming white spaces> for more details.
 
 =head1 DESCRIPTION
 
-EJS is a template engine with JavaScript code embedded.
+EJS is a template with JavaScript code embedded, and this module provides a
+template engine to generate output from EJS templates.
 
 It can be used as a general-purpose template engine to generate text documents,
 configurations, source code, etc.
