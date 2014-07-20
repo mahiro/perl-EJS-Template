@@ -12,8 +12,8 @@ ejs_test('<%=name%>', 'test', {name => 'test'});
 ejs_test('<% print(name); %>', 'test', {name => 'test'});
 
 ejs_test('<%= foo() + bar() %>', 'FOOBAR', {
-	foo => sub {return 'FOO'},
-	bar => sub {return 'BAR'},
+    foo => sub {return 'FOO'},
+    bar => sub {return 'BAR'},
 });
 
 ejs_test(<<__EJS__, <<__OUT__);

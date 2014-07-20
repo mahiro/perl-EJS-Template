@@ -11,9 +11,9 @@ use Scalar::Util qw(reftype);
 =cut
 
 sub new {
-	my ($class, $config) = @_;
-	$config = {} unless ref $config;
-	return bless {config => $config}, $class;
+    my ($class, $config) = @_;
+    $config = {} unless ref $config;
+    return bless {config => $config}, $class;
 }
 
 =head2 config
@@ -21,18 +21,18 @@ sub new {
 =cut
 
 sub config {
-	my $self = shift;
-	my $config = $self->{config};
-	
-	for my $name (@_) {
-		if ((reftype($config) || '') eq 'HASH') {
-			$config = $config->{$name};
-		} else {
-			return undef;
-		}
-	}
-	
-	return $config;
+    my $self = shift;
+    my $config = $self->{config};
+    
+    for my $name (@_) {
+        if ((reftype($config) || '') eq 'HASH') {
+            $config = $config->{$name};
+        } else {
+            return undef;
+        }
+    }
+    
+    return $config;
 }
 
 1;

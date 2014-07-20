@@ -8,19 +8,19 @@ use base 'EJS::Template::Base';
 use URI::Escape;
 
 our @EJS_FUNCTIONS = qw(
-	concat
-	escapeHTML
-	escapeXML
-	escapeURI
-	escapeQuote
+    concat
+    escapeHTML
+    escapeXML
+    escapeURI
+    escapeQuote
 );
 
 our %ESCAPES = qw(
-	raw   concat
-	html  escapeHTML
-	xml   escapeXML
-	uri   escapeURI
-	quote escapeQuote
+    raw   concat
+    html  escapeHTML
+    xml   escapeXML
+    uri   escapeURI
+    quote escapeQuote
 );
 
 =head2 make_map
@@ -28,15 +28,15 @@ our %ESCAPES = qw(
 =cut
 
 sub make_map {
-	my ($self) = @_;
-	my $class = ref $self || $self;
-	my $map = {};
-	
-	for my $name (@EJS_FUNCTIONS) {
-		$map->{$name} = \&{$class.'::'.$name};
-	}
-	
-	return $map;
+    my ($self) = @_;
+    my $class = ref $self || $self;
+    my $map = {};
+    
+    for my $name (@EJS_FUNCTIONS) {
+        $map->{$name} = \&{$class.'::'.$name};
+    }
+    
+    return $map;
 }
 
 =head2 concat
@@ -44,7 +44,7 @@ sub make_map {
 =cut
 
 sub concat {
-	return join('', @_);
+    return join('', @_);
 }
 
 =head2 escapeHTML
@@ -52,18 +52,18 @@ sub concat {
 =cut
 
 my $html_map = {
-	'<' => '&lt;',
-	'>' => '&gt;',
-	'"' => '&quot;',
-	"'" => '&#39;',
-	'&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '"' => '&quot;',
+    "'" => '&#39;',
+    '&' => '&amp;',
 };
 
 sub escapeHTML {
-	return join('', map {
-		s/([<>&"'])/$html_map->{$1}/g;
-		$_;
-	} @_);
+    return join('', map {
+        s/([<>&"'])/$html_map->{$1}/g;
+        $_;
+    } @_);
 }
 
 =head2 escapeXML
@@ -71,18 +71,18 @@ sub escapeHTML {
 =cut
 
 my $xml_map = {
-	'<' => '&lt;',
-	'>' => '&gt;',
-	'"' => '&quot;',
-	"'" => '&apos;',
-	'&' => '&amp;',
+    '<' => '&lt;',
+    '>' => '&gt;',
+    '"' => '&quot;',
+    "'" => '&apos;',
+    '&' => '&amp;',
 };
 
 sub escapeXML {
-	return join('', map {
-		s/([<>&"'])/$xml_map->{$1}/g;
-		$_;
-	} @_);
+    return join('', map {
+        s/([<>&"'])/$xml_map->{$1}/g;
+        $_;
+    } @_);
 }
 
 =head2 escapeURI
@@ -90,7 +90,7 @@ sub escapeXML {
 =cut
 
 sub escapeURI {
-	return join('', map {uri_escape($_)} @_);
+    return join('', map {uri_escape($_)} @_);
 }
 
 =head2 escapeQuote
@@ -98,10 +98,10 @@ sub escapeURI {
 =cut
 
 sub escapeQuote {
-	return join('', map {
-		s/(["'])/\\$1/g;
-		$_;
-	} @_);
+    return join('', map {
+        s/(["'])/\\$1/g;
+        $_;
+    } @_);
 }
 
 1;

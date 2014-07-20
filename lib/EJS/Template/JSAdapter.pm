@@ -11,10 +11,10 @@ EJS::Template::JSAdapter - JavaScript engine adapter for EJS::Template
 package EJS::Template::JSAdapter;
 
 our @SUPPORTED_ENGINES = qw(
-	JavaScript::V8
-	JavaScript
-	JavaScript::SpiderMonkey
-	JE
+    JavaScript::V8
+    JavaScript
+    JavaScript::SpiderMonkey
+    JE
 );
 
 my $default_engine;
@@ -36,34 +36,34 @@ An explicit engine can also be specified. E.g.
 =cut
 
 sub create {
-	my ($class, $engine) = @_;
-	
-	if ($engine) {
-		my $engine_class = $class.'::'.$engine;
-		eval "require $engine_class";
-		
-		if ($@) {
-			$engine_class = $engine;
-			eval "require $engine_class";
-			die $@ if $@;
-		}
-		
-		return $engine_class->new();
-	} elsif ($default_engine) {
-		return $default_engine->new();
-	} else {
-		for my $candidate (@SUPPORTED_ENGINES) {
-			my $engine_class = $class.'::'.$candidate;
-			eval "require $engine_class";
-			next if $@;
-			
-			$default_engine = $engine_class;
-			return $engine_class->new();
-		}
-		
-		die "No JavaScript engine modules are found. ".
-			"Consider to install JavaScript::V8";
-	}
+    my ($class, $engine) = @_;
+    
+    if ($engine) {
+        my $engine_class = $class.'::'.$engine;
+        eval "require $engine_class";
+        
+        if ($@) {
+            $engine_class = $engine;
+            eval "require $engine_class";
+            die $@ if $@;
+        }
+        
+        return $engine_class->new();
+    } elsif ($default_engine) {
+        return $default_engine->new();
+    } else {
+        for my $candidate (@SUPPORTED_ENGINES) {
+            my $engine_class = $class.'::'.$candidate;
+            eval "require $engine_class";
+            next if $@;
+            
+            $default_engine = $engine_class;
+            return $engine_class->new();
+        }
+        
+        die "No JavaScript engine modules are found. ".
+            "Consider to install JavaScript::V8";
+    }
 }
 
 =head2 new
@@ -84,8 +84,8 @@ This method should be overridden, and a property named 'context' is expected to 
 =cut
 
 sub new {
-	my ($class) = @_;
-	return bless {context => undef}, $class;
+    my ($class) = @_;
+    return bless {context => undef}, $class;
 }
 
 =head2 context
@@ -95,8 +95,8 @@ Retrieves the underlying context object.
 =cut
 
 sub context {
-	my ($self) = @_;
-	return $self->{context};
+    my ($self) = @_;
+    return $self->{context};
 }
 
 =head2 bind
@@ -114,13 +114,13 @@ This method should be overridden in a way that it can be invoked like this:
 =cut
 
 sub bind {
-	my ($self, $variables) = @_;
-	
-	if (my $context = $self->context) {
-		if ($context->can('bind')) {
-			return $context->bind($variables);
-		}
-	}
+    my ($self, $variables) = @_;
+    
+    if (my $context = $self->context) {
+        if ($context->can('bind')) {
+            return $context->bind($variables);
+        }
+    }
 }
 
 =head2 eval
@@ -134,13 +134,13 @@ This method should be overridden in a way that it can be invoked like this:
 =cut
 
 sub eval {
-	my ($self) = @_;
-	
-	if (my $context = $self->context) {
-		if ($context->can('eval')) {
-			return $context->eval($_[1]);
-		}
-	}
+    my ($self) = @_;
+    
+    if (my $context = $self->context) {
+        if ($context->can('eval')) {
+            return $context->eval($_[1]);
+        }
+    }
 }
 
 1;

@@ -14,41 +14,41 @@ use EJS::Template::Runtime;
 =cut
 
 sub execute {
-	my ($self, $input, $variables, $output) = @_;
-	my $engine = EJS::Template::JSAdapter->create($self->{config}{engine});
-	
-	my ($out, $out_close) = EJS::Template::IO->output($output);
-	my $ret;
-	
-	eval {
-		my $runtime = EJS::Template::Runtime->new($self);
-		$engine->bind({print => sub { print $out @_ }});
-		$engine->bind({EJS => $runtime->make_map()});
-		$engine->bind($variables);
-		
-		my ($in, $in_close) = EJS::Template::IO->input($input);
-		
-		eval {
-			local $/;
-			
-			if (defined(my $js = <$in>)) {
-				$ret = $engine->eval($js);
-				die $@ if $@;
-			} else {
-				$ret = 1;
-			}
-		};
-		
-		my $e = $@;
-		close $in if $in_close;
-		die $e if $e;
-	};
-	
-	my $e = $@;
-	close $out if $out_close;
-	die $e if $e;
-	
-	return $ret;
+    my ($self, $input, $variables, $output) = @_;
+    my $engine = EJS::Template::JSAdapter->create($self->{config}{engine});
+    
+    my ($out, $out_close) = EJS::Template::IO->output($output);
+    my $ret;
+    
+    eval {
+        my $runtime = EJS::Template::Runtime->new($self);
+        $engine->bind({print => sub { print $out @_ }});
+        $engine->bind({EJS => $runtime->make_map()});
+        $engine->bind($variables);
+        
+        my ($in, $in_close) = EJS::Template::IO->input($input);
+        
+        eval {
+            local $/;
+            
+            if (defined(my $js = <$in>)) {
+                $ret = $engine->eval($js);
+                die $@ if $@;
+            } else {
+                $ret = 1;
+            }
+        };
+        
+        my $e = $@;
+        close $in if $in_close;
+        die $e if $e;
+    };
+    
+    my $e = $@;
+    close $out if $out_close;
+    die $e if $e;
+    
+    return $ret;
 }
 
 1;
