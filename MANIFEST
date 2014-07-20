@@ -16,6 +16,7 @@ lib/EJS/Template/Parser/Context.pm
 lib/EJS/Template/Runtime.pm
 lib/EJS/Template/Util.pm
 lib/EJS/Template/Test.pm
+lib/EJS/Template/Util.pm
 t/00-load.t
 t/01-process.t
 t/02-engines.t
