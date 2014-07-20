@@ -6,7 +6,6 @@ package EJS::Template::JSAdapter::JavaScript::V8;
 use base 'EJS::Template::JSAdapter';
 
 use EJS::Template::Util qw(clean_text_ref);
-use JavaScript::V8;
 use Scalar::Util qw(reftype tainted);
 
 our $ENCODE_UTF8   = 1;
@@ -19,6 +18,7 @@ our $FORCE_UNTAINT = 1;
 
 sub new {
     my ($class) = @_;
+    eval 'use JavaScript::V8';
     my $context = JavaScript::V8::Context->new();
     return bless {context => $context}, $class;
 }

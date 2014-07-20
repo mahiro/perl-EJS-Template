@@ -6,7 +6,6 @@ package EJS::Template::JSAdapter::JE;
 use base 'EJS::Template::JSAdapter';
 
 use EJS::Template::Util qw(clean_text_ref);
-use JE;
 use Scalar::Util qw(reftype);
 
 our $ENCODE_UTF8   = 1;
@@ -19,6 +18,7 @@ our $FORCE_UNTAINT = 0;
 
 sub new {
     my ($class) = @_;
+    eval 'use JE';
     my $context = JE->new;
     return bless {context => $context}, $class;
 }

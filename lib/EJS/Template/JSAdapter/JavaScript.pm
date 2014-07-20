@@ -6,7 +6,6 @@ package EJS::Template::JSAdapter::JavaScript;
 use base 'EJS::Template::JSAdapter';
 
 use EJS::Template::Util qw(clean_text_ref);
-use JavaScript;
 use Scalar::Util qw(reftype);
 
 our $ENCODE_UTF8   = 1;
@@ -19,6 +18,7 @@ our $FORCE_UNTAINT = 1;
 
 sub new {
     my ($class) = @_;
+    eval 'use JavaScript';
     my $runtime = JavaScript::Runtime->new;
     my $context = $runtime->create_context;
     return bless {runtime => $runtime, context => $context}, $class;

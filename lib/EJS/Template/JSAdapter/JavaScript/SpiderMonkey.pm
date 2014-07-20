@@ -6,7 +6,6 @@ package EJS::Template::JSAdapter::JavaScript::SpiderMonkey;
 use base 'EJS::Template::JSAdapter';
 
 use EJS::Template::Util qw(clean_text_ref);
-use JavaScript::SpiderMonkey;
 use Scalar::Util qw(reftype);
 
 our $ENCODE_UTF8   = 0;
@@ -19,6 +18,7 @@ our $FORCE_UNTAINT = 0;
 
 sub new {
     my ($class) = @_;
+    eval 'use JavaScript::SpiderMonkey';
     my $context = JavaScript::SpiderMonkey->new;
     $context->init();
     return bless {context => $context}, $class;
