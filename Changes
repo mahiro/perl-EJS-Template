@@ -1,5 +1,8 @@
 Revision history for EJS-Template
 
+0.05    2014-07-24
+        Fix detection of installed JS engines
+
 0.04    2014-07-20
         Add more documentation
 
