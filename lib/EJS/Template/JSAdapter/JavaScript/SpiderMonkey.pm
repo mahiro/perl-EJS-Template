@@ -29,6 +29,7 @@ Creates an adapter object.
 sub new {
     my ($class) = @_;
     eval 'use JavaScript::SpiderMonkey';
+    die $@ if $@;
     my $context = JavaScript::SpiderMonkey->new;
     $context->init();
     return bless {context => $context}, $class;

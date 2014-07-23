@@ -74,6 +74,9 @@ sub create {
         return $default_engine->new();
     } else {
         for my $candidate (@SUPPORTED_ENGINES) {
+#            eval "require $candidate";
+#            next if $@;
+            
             my $engine_class = $class.'::'.$candidate;
             eval "require $engine_class";
             next if $@;

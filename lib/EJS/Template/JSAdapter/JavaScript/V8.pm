@@ -29,6 +29,7 @@ Creates an adapter object.
 sub new {
     my ($class) = @_;
     eval 'use JavaScript::V8';
+    die $@ if $@;
     my $context = JavaScript::V8::Context->new();
     return bless {context => $context}, $class;
 }

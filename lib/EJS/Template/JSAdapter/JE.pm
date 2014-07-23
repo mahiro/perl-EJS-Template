@@ -29,6 +29,7 @@ Creates an adapter object.
 sub new {
     my ($class) = @_;
     eval 'use JE';
+    die $@ if $@;
     my $context = JE->new;
     return bless {context => $context}, $class;
 }

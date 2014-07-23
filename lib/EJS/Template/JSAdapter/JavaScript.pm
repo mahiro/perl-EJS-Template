@@ -29,6 +29,7 @@ Creates an adapter object.
 sub new {
     my ($class) = @_;
     eval 'use JavaScript';
+    die $@ if $@;
     my $runtime = JavaScript::Runtime->new;
     my $context = $runtime->create_context;
     return bless {runtime => $runtime, context => $context}, $class;
