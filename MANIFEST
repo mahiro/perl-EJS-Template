@@ -26,3 +26,7 @@ t/05-escape.t
 t/06-quote.t
 t/07-context.t
 t/data/tainted.txt
+t/data/include/index.ejs
+t/data/include/header.ejs
+t/data/include/content.ejs
+t/data/include/footer.ejs

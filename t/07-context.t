@@ -2,9 +2,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use EJS::Template;
+use FindBin qw($RealBin);
 use IO::Scalar;
 
 my $v1 = {
@@ -79,4 +80,22 @@ is $result2, <<OUT;
 set_t1: foo = 6
 set_t1: foo = 120
 result: bar = 24
+OUT
+
+my $result3;
+
+EJS::Template->process("$RealBin/data/include/index.ejs", {
+    include => sub {
+        my ($path) = @_;
+        EJS::Template->context->process("$RealBin/data/include/$path");
+    }
+}, \$result3);
+
+is $result3, <<OUT;
+Header:
+This is a header.
+Content:
+This is a content.
+Footer:
+This is a footer.
 OUT
