@@ -30,9 +30,9 @@ sub new {
     my ($class) = @_;
     eval 'use JavaScript::SpiderMonkey';
     die $@ if $@;
-    my $context = JavaScript::SpiderMonkey->new;
-    $context->init();
-    return bless {context => $context}, $class;
+    my $engine = JavaScript::SpiderMonkey->new;
+    $engine->init();
+    return bless {engine => $engine}, $class;
 }
 
 =head2 bind
@@ -43,7 +43,7 @@ Implements the bind method.
 
 sub bind {
     my ($self, $variables) = @_;
-    my $context = $self->context;
+    my $engine = $self->engine;
     
     my $assign_value;
     my $assign_hash;
@@ -57,13 +57,13 @@ sub bind {
         
         if ($reftype) {
             if ($reftype eq 'HASH') {
-                my $new_obj = $context->object_by_path($path);
+                my $new_obj = $engine->object_by_path($path);
                 $assign_hash->($new_obj, $$source_ref, $path);
             } elsif ($reftype eq 'ARRAY') {
-                my $new_obj = $context->array_by_path($path);
+                my $new_obj = $engine->array_by_path($path);
                 $assign_array->($new_obj, $$source_ref, $path);
             } elsif ($reftype eq 'CODE') {
-                $context->function_set($name, $$source_ref, $obj);
+                $engine->function_set($name, $$source_ref, $obj);
             } elsif ($reftype eq 'SCALAR') {
                 $assign_array->($obj, $parent_path, $name, $$source_ref, $in_array);
             } else {
@@ -73,13 +73,13 @@ sub bind {
             my $text_ref = clean_text_ref($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
             
             if ($in_array) {
-                $context->array_set_element($obj, $name, $$text_ref);
+                $engine->array_set_element($obj, $name, $$text_ref);
             } else {
                 if ($parent_path) {
-                    $context->property_by_path($path, $$text_ref);
+                    $engine->property_by_path($path, $$text_ref);
                 } else {
                     JavaScript::SpiderMonkey::JS_DefineProperty(
-                        $context->{context}, $obj, $name, $$text_ref);
+                        $engine->{engine}, $obj, $name, $$text_ref);
                 }
             }
         }
@@ -102,14 +102,14 @@ sub bind {
         }
     };
     
-    $assign_hash->($context->{global_object}, $variables, '');
-    return $context;
+    $assign_hash->($engine->{global_object}, $variables, '');
+    return $engine;
 }
 
 sub DESTROY {
     my ($self) = @_;
-    $self->{context}->destroy();
-    delete $self->{context};
+    $self->{engine}->destroy();
+    delete $self->{engine};
 }
 
 =head1 SEE ALSO

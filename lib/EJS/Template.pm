@@ -21,11 +21,14 @@ Version 0.06
 
 our $VERSION = '0.06';
 
+our $context;
+
 =head1 SYNOPSIS
 
-EJS is a template with JavaScript code embedded. Anything inside the tag
-C<< <%...%> >> is executed as JavaScript code, and anything inside the tag
-C<< <%=...%> >> is replaced by the evaluated value.
+EJS is an "Embedded JavaScript" template engine.
+
+Anything inside the tag C<< <%...%> >> is executed as JavaScript code,
+and anything inside the tag C<< <%=...%> >> is replaced by the evaluated value.
 
     # Perl
     use EJS::Template;
@@ -40,6 +43,10 @@ C<< <%=...%> >> is replaced by the evaluated value.
     Hello, World!
     Hello, World!
     Hello, World!
+
+In the above example, the C<process()> method takes an input file path as the 
+first argument and variables passed to JavaScript as the second argument.
+The output is printed out to STDOUT by default.
 
 The C<process()> method can optionally take both input and output targets (file
 paths, IO handles, or scalar refs to strings).
@@ -90,14 +97,17 @@ HTML-escape every individual variable. (See L</Auto-escaping> for more details.)
 
 Extra white spaces around C<< <% >> and C<< %> >> are appropriately trimmed
 so that the result output will look fairly clean intuitively.
-See L</Trimming white spaces> for more details.
 
     <ul>
-    v-- Indent would make unnecessary space in the output.
       <% for (...) { %>
-        <li>...</li>   ^-- This line break would make an extra empty line where <%...%> is gone.
+        <li>...</li>
       <% } %>
     </ul>
+
+In the above example, the C<for>-loop line has the indent whitespace and the line break at the end.
+In order to make the result HTML look clean, these whitespaces are automatically removed.
+See L</Trimming white spaces> for more details.
+
 
 =head1 DESCRIPTION
 
@@ -151,7 +161,7 @@ See L</JavaScript engines> for more details.
 
 sub new {
     my ($class, %config) = @_;
-    my $self = {map {$_ => $config{$_}} qw(engine escape)};
+    my $self = {map {$_ => $config{$_}} qw(engine escape parser executor)};
     return bless $self, $class;
 }
 
@@ -197,11 +207,12 @@ Examples:
 
 sub process {
     my ($self, $input, $variables, $output) = @_;
+    local $context = ref $self ? $self : $self->new();
     
     eval {
         my $parsed;
-        $self->parse($input, \$parsed);
-        $self->execute(\$parsed, $variables, $output);
+        $context->parse($input, \$parsed);
+        $context->execute(\$parsed, $variables, $output);
     };
     
     die $@ if $@;
@@ -226,10 +237,11 @@ text-to-text conversion.
 
 sub apply {
     my ($self, $input, $variables) = @_;
+    local $context = ref $self ? $self : $self->new();
     my $output;
     
     eval {
-        $self->process(\$input, $variables, \$output);
+        $context->process(\$input, $variables, \$output);
     };
     
     die $@ if $@;
@@ -255,10 +267,10 @@ The semantics of INPUT and OUTPUT types are similar to C<process()>.
 
 sub parse {
     my ($self, $input, $parsed_output) = @_;
+    local $context = ref $self ? $self : $self->new();
     
     eval {
-        my $parser = EJS::Template::Parser->new($self);
-        $parser->parse($input, $parsed_output);
+        $context->parser->parse($input, $parsed_output);
     };
     
     die $@ if $@;
@@ -280,14 +292,150 @@ The semantics of INPUT and OUTPUT types are similar to C<process()>.
 
 sub execute {
     my ($self, $parsed_input, $variables, $output) = @_;
+    local $context = ref $self ? $self : $self->new();
     
     eval {
-        my $executor = EJS::Template::Executor->new($self);
-        $executor->execute($parsed_input, $variables, $output);
+        $context->executor->execute($parsed_input, $variables, $output);
     };
     
     die $@ if $@;
     return 1;
+}
+
+
+=head2 context
+
+Usage:
+
+    EJS::Template->context;
+
+Retrieves the C<EJS::Template> object under the current execution context.
+
+It is useful when retrieving the object from within the JavaScript execution.
+
+    my $template = EJS::Template->new();
+
+    $template->process(\*STDIN, {
+        callFromJS => sub {
+            my $context = EJS::Template->context;
+            # In this case, $context is the same as $template.
+            ...
+        }
+    });
+
+The above example is trivial because the current context can also be easily referenced
+from the outer C<$template> variable via the closure.
+However, even if this subroutine is defined in some other places, the current template
+object can always be retrieved via this call.
+
+=cut
+
+sub context {
+    my $class = shift;
+    $class = ref($class) || $class;
+    return $context ||= $class->new;
+}
+
+=head2 parser
+
+Gets or sets an C<EJS::Template::Parser> object.
+
+    # Getter
+    $template->parser;
+
+    # Setter
+    $template->parser(EJS::Template::Parser->new($template));
+
+=cut
+
+sub parser {
+    my $self = shift;
+    $self = $self->context unless ref $self;
+
+    if (@_) {
+        my $old = $self->{parser};
+        $self->{parser} = shift;
+        return $old;
+    } else {
+        return $self->{parser} ||= EJS::Template::Parser->new($self);
+    }
+}
+
+=head2 executor
+
+Gets or sets an C<EJS::Template::Executor> object.
+
+    # Getter
+    $template->executor;
+
+    # Setter
+    $template->executor(EJS::Template::Executor->new($template));
+
+=cut
+
+sub executor {
+    my $self = shift;
+    $self = $self->context unless ref $self;
+
+    if (@_) {
+        my $old = $self->{executor};
+        $self->{executor} = shift;
+        return $old;
+    } else {
+        return $self->{executor} ||= EJS::Template::Executor->new($self);
+    }
+}
+
+=head2 bind
+
+Binds name-value pairs to the associated JavaScript engine.
+
+    $template->bind({name1 => $value1});
+    $template->apply('<% print("name1 = ", name1) %>');
+
+=cut
+
+sub bind {
+    my $self = shift;
+    $self = $self->context unless ref $self;
+    return $self->executor->adapter->bind(@_);
+}
+
+=head2 eval
+
+Invokes the C<eval()> function of the associated JavaScript engine.
+
+    $template->eval('new Date().toString()');
+
+=cut
+
+sub eval {
+    my $self = shift;
+    $self = $self->context unless ref $self;
+    return $self->executor->adapter->eval(@_);
+}
+
+=head2 print
+
+Prints text to the current output target.
+
+    $template->print('Hello, World!');
+
+This method can only be called under the execution context, usually from
+within a subroutine invoked by JavaScript.
+
+    $template->process('example.ejs', {
+        callFromJS => sub {
+            $template->print('Hello, World!');
+        }
+    });
+
+=cut
+
+sub print {
+    my $self = shift;
+    $self = $self->context unless ref $self;
+    return $self->executor->print(@_);
 }
 
 
@@ -468,7 +616,31 @@ L<JE>
 
 It is also possible to specify a particular engine:
 
-   EJS::Template->new(engine => 'JE')->process(...);
+    EJS::Template->new(engine => 'JE')->process(...);
+    EJS::Template->new(engine => 'JavaScript::SpiderMonkey')->process(...);
+
+=head2 Including another EJS file
+
+Although this module does not provide the C<include> function as a built-in,
+it can be implemented as below, depending on the use case.
+
+    # Perl
+    my $template = EJS::Template->new({escape => 'html'});
+    $template->process('index.html.ejs', {
+        include => sub {
+            my ($path) = @_;
+            # TODO: Validate $path to avoid reading arbitrary files
+            my $context = EJS::Template->context;
+            $context->process($path);
+        }
+    });
+
+    # EJS (index.html.ejs)
+    <%
+    include('header.html.ejs');
+    include('content.html.ejs');
+    include('footer.html.ejs');
+    %>
 
 =head1 AUTHOR
 

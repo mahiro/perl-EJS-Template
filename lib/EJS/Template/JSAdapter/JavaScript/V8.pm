@@ -30,8 +30,8 @@ sub new {
     my ($class) = @_;
     eval 'use JavaScript::V8';
     die $@ if $@;
-    my $context = JavaScript::V8::Context->new();
-    return bless {context => $context}, $class;
+    my $engine = JavaScript::V8::Context->new();
+    return bless {engine => $engine}, $class;
 }
 
 =head2 bind
@@ -42,7 +42,7 @@ Implements the bind method.
 
 sub bind {
     my ($self, $variables) = @_;
-    my $context = $self->context;
+    my $engine = $self->engine;
     
     my $assign_value;
     my $assign_hash;
@@ -91,10 +91,10 @@ sub bind {
     $assign_hash->($clone, $variables);
     
     for my $name (keys %$clone) {
-        $context->bind($name, $clone->{$name});
+        $engine->bind($name, $clone->{$name});
     }
     
-    return $context;
+    return $engine;
 }
 
 =head1 SEE ALSO

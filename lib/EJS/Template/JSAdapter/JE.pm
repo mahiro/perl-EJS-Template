@@ -30,8 +30,8 @@ sub new {
     my ($class) = @_;
     eval 'use JE';
     die $@ if $@;
-    my $context = JE->new;
-    return bless {context => $context}, $class;
+    my $engine = JE->new;
+    return bless {engine => $engine}, $class;
 }
 
 =head2 bind
@@ -42,7 +42,7 @@ Implements the bind method.
 
 sub bind {
     my ($self, $variables) = @_;
-    my $context = $self->context;
+    my $engine = $self->engine;
     
     my $assign_value;
     my $assign_hash;
@@ -87,8 +87,8 @@ sub bind {
         }
     };
     
-    $assign_hash->($context, $variables);
-    return $context;
+    $assign_hash->($engine, $variables);
+    return $engine;
 }
 
 =head1 SEE ALSO

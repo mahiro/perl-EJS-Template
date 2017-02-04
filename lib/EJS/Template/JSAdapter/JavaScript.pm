@@ -31,8 +31,8 @@ sub new {
     eval 'use JavaScript';
     die $@ if $@;
     my $runtime = JavaScript::Runtime->new;
-    my $context = $runtime->create_context;
-    return bless {runtime => $runtime, context => $context}, $class;
+    my $engine = $runtime->create_context;
+    return bless {runtime => $runtime, engine => $engine}, $class;
 }
 
 =head2 bind
@@ -43,7 +43,7 @@ Implements the bind method.
 
 sub bind {
     my ($self, $variables) = @_;
-    my $context = $self->context;
+    my $engine = $self->engine;
     
     my $assign_value;
     my $assign_hash;
@@ -59,16 +59,16 @@ sub bind {
         
         if ($reftype) {
             if ($reftype eq 'HASH') {
-                #$context->bind_value($path, {});
-                JavaScript::Context::jsc_bind_value($context, $parent_path, $name, {});
+                #$engine->bind_value($path, {});
+                JavaScript::Context::jsc_bind_value($engine, $parent_path, $name, {});
                 $assign_hash->($path, $$source_ref);
             } elsif ($reftype eq 'ARRAY') {
-                #$context->bind_value($path, []);
-                JavaScript::Context::jsc_bind_value($context, $parent_path, $name, []);
+                #$engine->bind_value($path, []);
+                JavaScript::Context::jsc_bind_value($engine, $parent_path, $name, []);
                 $assign_array->($path, $$source_ref);
             } elsif ($reftype eq 'CODE') {
-                #$context->bind_function($path, $$source_ref);
-                JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$source_ref);
+                #$engine->bind_function($path, $$source_ref);
+                JavaScript::Context::jsc_bind_value($engine, $parent_path, $name, $$source_ref);
             } elsif ($reftype eq 'SCALAR') {
                 $assign_value->($parent_path, $name, $$source_ref, $in_array);
             } else {
@@ -82,9 +82,9 @@ sub bind {
             # If $self is passed as above, an odd memory leak occurs, detected by
             # JavaScript::Context::DESTROY
             
-            #$context->bind_value($path, $$source_ref);
+            #$engine->bind_value($path, $$source_ref);
             my $text_ref = clean_text_ref($source_ref, $ENCODE_UTF8, $SANITIZE_UTF8, $FORCE_UNTAINT);
-            JavaScript::Context::jsc_bind_value($context, $parent_path, $name, $$text_ref);
+            JavaScript::Context::jsc_bind_value($engine, $parent_path, $name, $$text_ref);
         }
     };
     
@@ -106,14 +106,14 @@ sub bind {
     };
     
     $assign_hash->('', $variables);
-    return $context;
+    return $engine;
 }
 
 sub DESTROY {
     my ($self) = @_;
-    $self->{context}->_destroy();
+    $self->{engine}->_destroy();
     $self->{runtime}->_destroy();
-    delete $self->{context};
+    delete $self->{engine};
     delete $self->{runtime};
 }
 

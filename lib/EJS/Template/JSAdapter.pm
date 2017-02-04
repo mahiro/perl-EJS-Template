@@ -37,7 +37,7 @@ our @SUPPORTED_ENGINES = qw(
     JE
 );
 
-my $default_engine;
+my $default_adapter_class;
 
 =head1 Methods
 
@@ -45,7 +45,7 @@ my $default_engine;
 
 Instantiates a JavaScript engine adapter object.
 
-    my $engine = EJS::Template::JSAdapter->create();
+    my $adapter = EJS::Template::JSAdapter->create();
 
 If no argument is passed, an engine is selected from the available ones.
 
@@ -60,29 +60,29 @@ sub create {
     my ($class, $engine) = @_;
     
     if ($engine) {
-        my $engine_class = $class.'::'.$engine;
-        eval "require $engine_class";
+        my $adapter_class = $class.'::'.$engine;
+        eval "require $adapter_class";
         
         if ($@) {
-            $engine_class = $engine;
-            eval "require $engine_class";
+            $adapter_class = $engine;
+            eval "require $adapter_class";
             die $@ if $@;
         }
         
-        return $engine_class->new();
-    } elsif ($default_engine) {
-        return $default_engine->new();
+        return $adapter_class->new();
+    } elsif ($default_adapter_class) {
+        return $default_adapter_class->new();
     } else {
         for my $candidate (@SUPPORTED_ENGINES) {
             eval "require $candidate";
             next if $@;
             
-            my $engine_class = $class.'::'.$candidate;
-            eval "require $engine_class";
+            my $adapter_class = $class.'::'.$candidate;
+            eval "require $adapter_class";
             next if $@;
             
-            $default_engine = $engine_class;
-            return $engine_class->new();
+            $default_adapter_class = $adapter_class;
+            return $adapter_class->new();
         }
         
         die "No JavaScript engine modules are found. ".
@@ -94,33 +94,33 @@ sub create {
 
 Creates an adapter object.
 
-This method should be overridden, and a property named 'context' is expected to be set up.
+This method should be overridden, and a property named 'engine' is expected to be set up.
 
     package Some::Extended::JSAdapter;
     use base 'EJS::Template::JSAdapter';
     
     sub new {
         my ($class) = @_;
-        my $context = Some::Underlying::JavaScript::Context->new();
-        return bless {context => $context}, $class;
+        my $engine = Some::Underlying::JavaScript::Engine->new();
+        return bless {engine => $engine}, $class;
     }
 
 =cut
 
 sub new {
     my ($class) = @_;
-    return bless {context => undef}, $class;
+    return bless {engine => undef}, $class;
 }
 
-=head2 context
+=head2 engine
 
-Retrieves the underlying context object.
+Retrieves the underlying engine object.
 
 =cut
 
-sub context {
+sub engine {
     my ($self) = @_;
-    return $self->{context};
+    return $self->{engine};
 }
 
 =head2 bind
@@ -140,9 +140,9 @@ This method should be overridden in a way that it can be invoked like this:
 sub bind {
     my ($self, $variables) = @_;
     
-    if (my $context = $self->context) {
-        if ($context->can('bind')) {
-            return $context->bind($variables);
+    if (my $engine = $self->engine) {
+        if ($engine->can('bind')) {
+            return $engine->bind($variables);
         }
     }
 }
@@ -160,9 +160,9 @@ This method should be overridden in a way that it can be invoked like this:
 sub eval {
     my ($self) = @_;
     
-    if (my $context = $self->context) {
-        if ($context->can('eval')) {
-            return $context->eval($_[1]);
+    if (my $engine = $self->engine) {
+        if ($engine->can('eval')) {
+            return $engine->eval($_[1]);
         }
     }
 }
