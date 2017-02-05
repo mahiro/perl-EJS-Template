@@ -111,8 +111,8 @@ sub bind {
 
 sub DESTROY {
     my ($self) = @_;
-    $self->{engine}->_destroy();
-    $self->{runtime}->_destroy();
+    $self->{engine}->_destroy() if $self->{engine};
+    $self->{runtime}->_destroy() if $self->{runtime};
     delete $self->{engine};
     delete $self->{runtime};
 }
