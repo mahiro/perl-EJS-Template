@@ -45,7 +45,7 @@ sub execute {
 
         my $runtime = EJS::Template::Runtime->new($self);
         my $adapter = $self->adapter;
-        $adapter->bind({print => sub { $self->print(@_) }});
+        $adapter->bind({print => sub { print $out @_ }});
         $adapter->bind({EJS => $runtime->make_map()});
         $adapter->bind($variables);
 

@@ -23,6 +23,7 @@ Common constructor with the config
 sub new {
     my ($class, $config) = @_;
     $config = {} unless ref $config;
+    $config = {map {$_ => $config->{$_}} @EJS::Template::CONFIG_KEYS};
     return bless {config => $config}, $class;
 }
 

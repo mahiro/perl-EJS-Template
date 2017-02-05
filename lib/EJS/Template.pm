@@ -21,6 +21,7 @@ Version 0.07
 
 our $VERSION = '0.07';
 
+our @CONFIG_KEYS = qw(engine escape);
 our $context;
 
 =head1 SYNOPSIS
@@ -161,7 +162,7 @@ See L</JavaScript engines> for more details.
 
 sub new {
     my ($class, %config) = @_;
-    my $self = {map {$_ => $config{$_}} qw(engine escape parser executor)};
+    my $self = {map {$_ => $config{$_}} @CONFIG_KEYS, qw(parser executor)};
     return bless $self, $class;
 }
 
