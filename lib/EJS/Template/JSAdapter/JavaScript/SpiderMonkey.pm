@@ -79,7 +79,7 @@ sub bind {
                     $engine->property_by_path($path, $$text_ref);
                 } else {
                     JavaScript::SpiderMonkey::JS_DefineProperty(
-                        $engine->{engine}, $obj, $name, $$text_ref);
+                        $engine->{context}, $obj, $name, $$text_ref);
                 }
             }
         }
