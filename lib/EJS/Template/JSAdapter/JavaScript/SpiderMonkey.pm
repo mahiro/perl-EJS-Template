@@ -108,7 +108,7 @@ sub bind {
 
 sub DESTROY {
     my ($self) = @_;
-    $self->{engine}->destroy();
+    $self->{engine}->destroy() if $self->{engine};
     delete $self->{engine};
 }
 
