@@ -643,6 +643,33 @@ it can be implemented as below, depending on the use case.
     include('footer.html.ejs');
     %>
 
+=head2 Unicode/UTF-8
+
+Some JavaScript engines correctly translate Unicode strings in Perl (utf8 flag turned on)
+into Unicode strings in JavaScript, and vice versa.
+
+    # Perl to JavaScript
+    use utf8;
+    my $input = "{Unicode string}";
+    EJS::Template->process(\'<%=str%>', {str => $input});
+
+    # JavaScript to Perl
+    my $output;
+    EJS::Template->process(\'<%func("{Unicode string}")%>', {
+        func => sub {$output = shift}
+    });
+
+Currently, C<JavaScript::V8> and C<JE> work as expected, but SpiderMonkey-based engines
+seem to have issues with Unicode as below.
+
+If Unicode strings in Perl are passed to JavaScript, then the strings are unexpectedly
+encoded as UTF-8, where each character in JavaScript strings corresponds to each byte
+of UTF-8 characters.
+
+If Unicode strings in JavaScript are passed to Perl, then the strings may
+become corrupted.
+
+
 =head1 AUTHOR
 
 Mahiro Ando, C<< <mahiro at cpan.org> >>
