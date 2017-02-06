@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-my $tests; BEGIN {$tests = 25}
+my $tests; BEGIN {$tests = 26}
 use EJS::Template::JSAdapter;
 use Test::More tests => 4 + $tests * scalar(@EJS::Template::JSAdapter::SUPPORTED_ENGINES);
 
@@ -14,6 +14,7 @@ use Scalar::Util qw(tainted);
 
 my $encoded_text = "\xE3\x83\x86\xE3\x82\xB9\xE3\x83\x88";
 my $decoded_text = decode_utf8($encoded_text);
+my $unicode_notation = "\\u30C6\\u30B9\\u30C8";
 my $invalid_text = "Invalid: \xFF";
 my $sanitized_text = "Invalid: \xEF\xBF\xBD";
 my $tainted_text = do {
@@ -83,15 +84,26 @@ for my $engine (@EJS::Template::JSAdapter::SUPPORTED_ENGINES) {
         ejs_test('<%= array[4][0] %>', 'G', $variables, $config);
         ejs_test('<%= array[4][1] %>', '7', $variables, $config);
         ejs_test('<%= array[4][2]() %>', 'VII', $variables, $config);
+
+        no strict 'refs';
+        my $sanitize_utf8 = ${"EJS::Template::JSAdapter::".$engine."::SANITIZE_UTF8"};
+        my $preserve_utf8 = ${"EJS::Template::JSAdapter::".$engine."::PRESERVE_UTF8"};
+        use strict 'refs';
         
-        my $invalid_text_expected = do {
-            no strict 'refs';
-            (${"EJS::Template::JSAdapter::".$engine."::SANITIZE_UTF8"} ?
-                    $sanitized_text : $invalid_text);
-        };
+        my $decoded_text_expected = ($preserve_utf8 ? $decoded_text : $encoded_text);
+        my $invalid_text_expected = ($sanitize_utf8 ? $sanitized_text : $invalid_text);
         
         ejs_test('<%= encoded %>', $encoded_text, $variables, $config);
-        ejs_test('<%= decoded %>', $encoded_text, $variables, $config);
+        ejs_test('<%= decoded %>', $decoded_text_expected, $variables, $config);
+
+        SKIP: {
+            if ($preserve_utf8) {
+                ejs_test("<%= '$unicode_notation' %>", $decoded_text, $variables, $config);
+            } else {
+                skip "$engine cannot preserve unicode", 1;
+            }
+        }
+
         ejs_test('<%= invalid %>', $invalid_text_expected, $variables, $config);
         ejs_test('<%= tainted %>', $tainted_text, $variables, $config);
     }

@@ -17,6 +17,7 @@ use Scalar::Util qw(reftype);
 our $ENCODE_UTF8   = 0;
 our $SANITIZE_UTF8 = 0;
 our $FORCE_UNTAINT = 0;
+our $PRESERVE_UTF8 = 0;
 
 =head1 Methods
 

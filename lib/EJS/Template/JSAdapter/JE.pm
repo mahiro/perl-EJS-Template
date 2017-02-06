@@ -14,9 +14,10 @@ use base 'EJS::Template::JSAdapter';
 use EJS::Template::Util qw(clean_text_ref);
 use Scalar::Util qw(reftype);
 
-our $ENCODE_UTF8   = 1;
+our $ENCODE_UTF8   = 0;
 our $SANITIZE_UTF8 = 0;
 our $FORCE_UNTAINT = 0;
+our $PRESERVE_UTF8 = 1;
 
 =head1 Methods
 
